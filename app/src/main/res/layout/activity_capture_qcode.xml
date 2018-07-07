@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="left|center_vertical"
+    android:orientation="vertical"
+    tools:context="network.b.bnet.net.Join_Network">
+
+    <include
+        android:id="@+id/title"
+        layout="@layout/part_basehead"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/activity_title_height"></include>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <SurfaceView
+            android:id="@+id/surface_preview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <View android:id="@+id/left_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_toLeftOf="@+id/vfv_scan_qrcode"
+            android:background="#b0000000"></View>
+        <View  android:id="@+id/right_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_toRightOf="@+id/vfv_scan_qrcode"
+            android:background="#b0000000"></View>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_toLeftOf="@+id/right_view"
+            android:layout_toRightOf="@+id/left_view"
+            android:layout_above="@+id/vfv_scan_qrcode"
+            android:background="#b0000000"></View>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_toLeftOf="@+id/right_view"
+            android:layout_toRightOf="@+id/left_view"
+            android:layout_below="@+id/vfv_scan_qrcode"
+            android:background="#b0000000"></View>
+        <network.b.bnet.utils.zxing.view.ViewfinderView
+            android:id="@+id/vfv_scan_qrcode"
+            android:layout_width="260dp"
+            android:layout_height="260dp"
+            android:layout_centerInParent="true"/>
+    </RelativeLayout>
+</LinearLayout>

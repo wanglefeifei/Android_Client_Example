@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@color/base_background_color"
+              android:orientation="vertical">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"></View>
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="3"
+        android:paddingLeft="@dimen/dis_element_to_side"
+        android:paddingRight="@dimen/dis_element_to_side"
+        android:background="@color/base_white_color">
+
+        <ImageView
+            android:id="@+id/main_net_status_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:src="@mipmap/main_link_status"/>
+
+        <TextView
+            android:id="@+id/main_net_status_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/main_net_status_img"
+            android:layout_marginLeft="@dimen/dis_element_to_side"
+            android:text="状态"
+            android:textSize="@dimen/base_text_size"/>
+
+        <Switch
+            android:id="@+id/main_net_status_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:text=""/>
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"></View>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="线路"/>
+
+    <RelativeLayout
+        android:id="@+id/private_network"
+        android:layout_marginTop="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="3"
+        android:background="@color/base_white_color"
+        android:paddingLeft="@dimen/dis_element_to_side"
+        android:paddingRight="@dimen/dis_element_to_side">
+
+        <ImageView
+            android:id="@+id/main_net_line_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:src="@mipmap/main_link_net_sp_icon"/>
+
+        <TextView
+            android:id="@+id/main_net_line_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/dis_element_to_side"
+            android:textSize="@dimen/base_text_size"
+            android:layout_toRightOf="@+id/main_net_line_img"
+            android:text="专用网络"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:src="@mipmap/main_link_net_sp_right_icon"
+            android:layout_centerVertical="true"/>
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"></View>
+
+    <RelativeLayout
+        android:id="@+id/join_network"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="3"
+        android:paddingLeft="@dimen/dis_element_to_side"
+        android:paddingRight="@dimen/dis_element_to_side"
+        android:background="@color/base_white_color">
+
+        <ImageView
+            android:id="@+id/main_net_join_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"/>
+
+        <TextView
+            android:id="@+id/main_net_join_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:textSize="@dimen/base_text_size"
+            android:layout_toRightOf="@+id/main_net_join_img"
+            android:text="加入网络..."/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"/>
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="20"></View>
+</LinearLayout>

@@ -1,0 +1,26 @@
+// BnetAidlInterface.aidl
+package network.b.bnet.service;
+
+// Declare any non-default types here with import statements
+
+interface BnetAidlInterface {
+   int create(String nWalletAddr, String masterAddr, int maskBit);
+
+   	//start BNET engine
+   	 int join(String nWalletAddr, String dWalletAddr, String deviceAddr, int maskBit);
+
+   	//stop BNET engine
+   	 int accept(String deviceAddr, int maskBit);
+
+   	//get wallet balance.
+   	 int reject() ;
+
+   	 int leave();
+String getRequest();
+String getStatus();
+void sendUdpMessage(in byte[] data, String to, int port);
+void onUdpMessage(in byte[] data);
+void sendTunMessage(in byte[] data);
+void onTunMessage(in byte[] data);
+
+}

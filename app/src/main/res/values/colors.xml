@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="base_while_transparent50">#80ffffff</color>
+    <color name="base_while_transparent80">#ccffffff</color>
+    <color name="base_while_transparent40">#66ffffff</color>
+    <color name="base_transparent">#00000000</color>
+    <color name="base_pink_color">#82c247</color>
+    <color name="baseGreen">#cc01cf08</color>
+    <color name="subject_dragtrack_right">#ff8598</color>
+    <color name="base_white_color">#ffffff</color>
+    <color name="base_background_color">#e1e2e6</color>
+    <color name="base_blue_color">#3c69e8</color>
+    <color name="base_red_color">#ff0000</color>
+    <color name="base_gray_color">#666666</color>
+</resources>
