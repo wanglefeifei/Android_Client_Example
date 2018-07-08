@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="network.b.bnet.net.Net_Logout">
+
+    <include
+        android:id="@+id/title"
+        layout="@layout/part_basehead"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/activity_title_height"></include>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="3"></View>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="3"
+        android:background="@color/base_white_color"
+        android:paddingLeft="@dimen/dis_element_to_side"
+        android:paddingRight="@dimen/dis_element_to_side">
+
+        <TextView
+            android:id="@+id/main_user_message_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:text="网络ID"/>
+
+        <TextView
+            android:id="@+id/main_user_message_count"
+            android:layout_width="5dp"
+            android:layout_height="5dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:text="211222"
+            android:textColor="@color/base_white_color"/>
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="3"></View>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:gravity="center">
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"></View>
+
+        <TextView
+            android:id="@+id/logout_btn"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3"
+            android:gravity="center"
+            android:background="@drawable/shape_cricle_horn_blue"
+            android:text="@string/logout_net"
+            android:textColor="@color/base_white_color"
+            android:textSize="@dimen/base_text_size"/>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"></View>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="28"></View>
+</LinearLayout>

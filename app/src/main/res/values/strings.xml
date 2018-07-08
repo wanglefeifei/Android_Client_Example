@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">BNET</string>
+    <string name="logout_net">退出网络</string>
+    <string name="private_tee_net">TEE专用网络</string>
+    <string name="input_network_id">TEE专用网络</string>
+    <string name="join_in_newwork">加入网络</string>
+    <string name="scan">扫一扫</string>
+    <string name="my">我的</string>
+    <string name="link">连接</string>
+    <string name="please_input_word">请输入信息</string>
+</resources>

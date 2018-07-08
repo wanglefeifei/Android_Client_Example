@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="network.b.bnet">
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <!-- 往sdcard中读写数据的权限 -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <!-- 使用相机的权限 -->
+    <uses-feature android:name="android.hardware.camera"/>
+    <!-- 自动聚焦的权限 -->
+    <uses-feature android:name="android.hardware.camera.autofocus"/>
+
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+
+    <application
+        android:name=".base.BNetApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/MyAppTheme">
+        <activity android:name=".MainActivity">
+        </activity>
+
+        <service
+            android:name=".service.BnetService"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":mine.bnet">
+        </service>
+
+        <activity android:name=".userinfo.UserMain">
+        </activity>
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="network.b.bnet"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths"/>
+        </provider>
+
+        <activity android:name=".startload.StartActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+        <activity android:name=".startload.LoginActivity">
+        </activity>
+        <activity android:name=".net.Net_Logout">
+        </activity>
+        <activity android:name=".order.HistoricalBill">
+        </activity>
+        <activity android:name=".net.Join_Network">
+        </activity>
+        <activity android:name=".order.Recharge">
+        </activity>
+        <activity android:name=".net.Management_Network">
+        </activity>
+        <activity android:name=".net.Management_Network_Detailed">
+        </activity>
+        <activity android:name=".userinfo.User_Message">
+        </activity>
+        <activity android:name=".utils.zxing.activity.CaptureActivity"></activity>
+    </application>
+
+</manifest>
