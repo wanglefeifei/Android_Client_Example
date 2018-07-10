@@ -123,7 +123,7 @@ public final class ViewfinderView extends View {
         Resources resources = getResources();
         maskColor = Color.parseColor("#60000000");
         resultColor = Color.parseColor("#b0000000");
-        angleColor = Color.parseColor("#4169E1");
+        angleColor = Color.parseColor("#00000000");
         resultPointColor = Color.parseColor("#7B68EE");
         possibleResultPoints = new HashSet<ResultPoint>(5);
     }
