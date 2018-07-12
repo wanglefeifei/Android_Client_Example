@@ -17,10 +17,11 @@ interface BnetAidlInterface {
 
    	 int leave();
 String getRequest();
-String getStatus();
+int getStatus();
 void sendUdpMessage(in byte[] data, String to, int port);
 void onUdpMessage(in byte[] data);
 void sendTunMessage(in byte[] data);
 void onTunMessage(in byte[] data);
+void CStartService();
 
 }
