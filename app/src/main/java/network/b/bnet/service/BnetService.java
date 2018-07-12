@@ -10,10 +10,14 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import java.io.Closeable;
+import java.io.FileDescriptor;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.nio.channels.Selector;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
@@ -95,7 +99,7 @@ public class BnetService extends VpnService {
             executorService.submit(new TCPOutput(deviceToNetworkTCPQueue, networkToDeviceQueue, tcpSelector, this));
             //build vpn
             Global.vpnFileDescriptor = vpnInterface.getFileDescriptor();
-            executorService.submit(new LocalVPNService.VPNRunnable(Global.vpnFileDescriptor,
+            executorService.submit(new VPNRunnable(Global.vpnFileDescriptor,
                     deviceToNetworkUDPQueue, deviceToNetworkTCPQueue, networkToDeviceQueue));
             LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(BROADCAST_VPN_STATE).putExtra("running", true));
             Log.i(TAG, "Started");
@@ -123,6 +127,142 @@ public class BnetService extends VpnService {
                 resource.close();
             } catch (IOException e) {
                 // Ignore
+            }
+        }
+    }
+
+    public static class VPNRunnable implements Runnable {
+        private static final String TAG = VPNRunnable.class.getSimpleName();
+        private FileDescriptor vpnFileDescriptor;
+        private ConcurrentLinkedQueue<Packet> deviceToNetworkUDPQueue;
+        private ConcurrentLinkedQueue<Packet> deviceToNetworkTCPQueue;
+        private ConcurrentLinkedQueue<ByteBuffer> networkToDeviceQueue;
+
+        public VPNRunnable(FileDescriptor vpnFileDescriptor,
+                           ConcurrentLinkedQueue<Packet> deviceToNetworkUDPQueue,
+                           ConcurrentLinkedQueue<Packet> deviceToNetworkTCPQueue,
+                           ConcurrentLinkedQueue<ByteBuffer> networkToDeviceQueue) {
+            this.vpnFileDescriptor = vpnFileDescriptor;
+            this.deviceToNetworkUDPQueue = deviceToNetworkUDPQueue;
+            this.deviceToNetworkTCPQueue = deviceToNetworkTCPQueue;
+            this.networkToDeviceQueue = networkToDeviceQueue;
+        }
+
+        @Override
+        public void run() {
+            Log.i(TAG, "Started");
+            FileChannel vpnInput = new FileInputStream(vpnFileDescriptor).getChannel();//vpnInterface.getFileDescriptor()
+            FileChannel vpnOutput = new FileOutputStream(vpnFileDescriptor).getChannel();
+            try {
+                ByteBuffer bufferToNetwork = null;
+                boolean dataSent = true;
+                boolean dataReceived;
+                while (!Thread.interrupted()) {
+                    if (dataSent)
+                        bufferToNetwork = ByteBufferPool.acquire();
+                    else
+                        bufferToNetwork.clear();
+                    //  Block when not connected
+                    int readBytes = vpnInput.read(bufferToNetwork);
+                    if (readBytes > 0) {
+                        dataSent = true;
+                        bufferToNetwork.flip();
+                        if (Global.hnodereceivewhereis == false) {
+                            //RECIEVE TUN MSG THEN SEND HeferPeer_WHERE_IS_PEER_REQ TO HNODE
+                            byte[] whereIsMsg = new byte[142];
+                            String heferId = "hefer_r9test";//length:64
+                            byte[] strHeferId = heferId.getBytes();//walletid
+                            System.arraycopy(strHeferId, 0, whereIsMsg, 0, strHeferId.length); //walletid
+                            int deviceid = Global.deviceid;//u2
+                            byte[] u2RNodeId = ByteConvert.ushortToBytes(deviceid);
+                            System.arraycopy(u2RNodeId, 0, whereIsMsg, 64, u2RNodeId.length);
+                            byte[] strToHeferId = new byte[64];
+                            System.arraycopy(strToHeferId, 0, whereIsMsg, 66, strToHeferId.length);
+                            int u2ToRNodeId = 0;
+                            byte[] b_u2ToRNodeId = ByteConvert.ushortToBytes(u2ToRNodeId);
+                            System.arraycopy(b_u2ToRNodeId, 0, whereIsMsg, 130, b_u2ToRNodeId.length); // RNode_u2HNodeId
+                            whereIsMsg[132] = 0;//regReqMsg.u1Version = 0; //Always be 0
+                            whereIsMsg[133] = 41;//u1Type = HeferPeer_WHERE_IS_PEER_REQ
+                            int u2Seq = 0;//u2
+                            byte[] b_u2Seq = ByteConvert.ushortToBytes(u2Seq);
+                            System.arraycopy(b_u2Seq, 0, whereIsMsg, 134, b_u2Seq.length); //u2Seq
+                            long u4ReqAddr = 0;
+                            byte[] b_u4ReqAddr = ByteConvert.uintToBytes(u4ReqAddr);
+                            System.arraycopy(b_u4ReqAddr, 0, whereIsMsg, 136, b_u4ReqAddr.length);
+                            int u2DefaultRNodeId = Global.u2DefaultRNodeId;
+                            byte[] b_u2DefaultRNodeId = ByteConvert.ushortToBytes(u2DefaultRNodeId);
+                            System.arraycopy(b_u2DefaultRNodeId, 0, whereIsMsg, 140, b_u2DefaultRNodeId.length); //u2Seq
+                            //dst ip:172.217.26.36
+                            InetAddress HNode = InetAddress.getByName("47.92.124.231");
+                            bNetT.sendUdpMessage(whereIsMsg, HNode, 15555);
+                            System.out.println("send whereis to hnode!");
+                            Global.hadSendWhereIs = true;
+                        }
+                        if (HeferMsg_PeerRouteInd.u1Result == 1) {
+                            //data encrypt then send rnode33
+                            AESCrypt aesobject;
+                            //System.out.println("############ start encrypt data");
+                            //SecretKeySpec key =  AESCrypt.generateKey("123456");
+                            // byte[] iv = {0x01, 0x12, 0x23, 0x34, 0x45, 0x56, 0x67, 0x78,(byte)0x89,(byte) 0x7a, 0x6b, 0x5c, 0x4d, 0x3e, 0x2f, 0x10 };
+                            int remaining = bufferToNetwork.remaining();
+                            //System.out.println("############ bufferToNetwork.remaining:"+ remaining);
+                            byte[] message = new byte[remaining + 6 + 136];
+                            bufferToNetwork.get(message, 6 + 136, remaining);//buffer��ȡ��bufferToNetwork.remaining()����
+                            //1,2byte
+                            int longOfmessage = remaining + 2;
+                            //System.out.println("############   longOfmessage:"+ longOfmessage);
+                            byte[] b_u2longOfmessage = ByteConvert.ushortToBytes(longOfmessage);
+                            System.arraycopy(b_u2longOfmessage, 0, message, 136, b_u2longOfmessage.length); //137�ĳ�136
+                            //5,6byte
+                            longOfmessage = remaining;
+                            byte[] b_u2longOfmessage56 = ByteConvert.ushortToBytes(longOfmessage);
+                            System.arraycopy(b_u2longOfmessage56, 0, message, 140, b_u2longOfmessage56.length); //141�ĳ�140
+                            Global.hefer_header[133] = 51;//HeferPeer_DATA_IND;
+                            //to rnodeid
+                            System.arraycopy(HeferMsg_PeerRouteInd.RouteIndCodeStream, 0, Global.hefer_header, 130, 2);
+                            //to nextpop heferid
+                            System.arraycopy(HeferMsg_PeerRouteInd.RouteIndCodeStream, 10, Global.hefer_header, 66, 64);
+                            //lpq;
+                            System.arraycopy(Global.hefer_header, 0, message, 0, 136); //u2Seq
+                            //AESCrypt.encrypt( key, iv,  message);
+                            InetAddress RNode33 = InetAddress.getByName("139.162.41.158");
+                            bNetT.sendUdpMessage(message, RNode33, 56789);
+                            /*
+							   for (int i = 0;i<20;i++)
+							   {
+								   System.out.println("############### message"+(142+i)+":"+message[142+i]);
+							   }
+							   byte[] b_u2longOfmessage_3  = new byte[2];
+							   System.arraycopy( message, 136, b_u2longOfmessage_3, 0,2); //u2Seq
+							   int messagelong_3 = ByteConvert.bytesToUshort(b_u2longOfmessage_3);
+							   System.out.println(" messagelong_3:"+messagelong_3);
+							*/
+                        }
+                    } else//readbyte<0
+                    {
+                        dataSent = false;
+                    }
+                    ByteBuffer bufferFromNetwork = networkToDeviceQueue.poll();
+                    if (bufferFromNetwork != null) {
+                        bufferFromNetwork.flip();
+                        while (bufferFromNetwork.hasRemaining())
+                            vpnOutput.write(bufferFromNetwork);
+                        dataReceived = true;
+                        ByteBufferPool.release(bufferFromNetwork);
+                    } else {
+                        dataReceived = false;
+                    }
+                    // TODO: Sleep-looping is not very battery-friendly, consider blocking instead
+                    // Confirm if throughput with ConcurrentQueue is really higher compared to BlockingQueue
+                    if (!dataSent && !dataReceived)
+                        Thread.sleep(10);
+                }
+            } catch (InterruptedException e) {
+                Log.i(TAG, "Stopping");
+            } catch (IOException e) {
+                Log.w(TAG, e.toString(), e);
+            } finally {
+                closeResources(vpnInput, vpnOutput);
             }
         }
     }
