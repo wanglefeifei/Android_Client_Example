@@ -4,14 +4,19 @@ import android.content.Intent;
 import android.view.View;
 import android.widget.CompoundButton;
 
+import java.util.UUID;
+
+import network.b.bnet.base.BNetApplication;
 import network.b.bnet.net.Join_Network;
 import network.b.bnet.net.Net_Logout;
+import network.b.bnet.utils.SharePreferenceMain;
 
 /**
  * Created by jack.ma on 2018/6/27.
  */
 
 public class MainActivity_Presenter implements View.OnClickListener {
+
 
     private MainActivity_LinkView mainActivity_linkView;
     private MainActivity_MyView mainActivity_myView;
@@ -30,13 +35,27 @@ public class MainActivity_Presenter implements View.OnClickListener {
         mainActivity_linkView.main_net_status_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (mainActivity == null) {
+                    return;
+                }
                 if (b) {
+                    if (mainActivity != null)
+                        mainActivity.startVPN();
 
                 } else {
-                    
+                    BNetApplication.getInstance().DestoryBnetService();
                 }
             }
         });
+    }
+
+    public void StartVpvJoin() {
+        String dWalletAddr = SharePreferenceMain.getSharedPreference(mainActivity.getApplicationContext()).getdWalletAddr();
+        if (dWalletAddr == null) {
+            dWalletAddr = UUID.randomUUID().toString();
+            SharePreferenceMain.getSharedPreference(mainActivity.getApplicationContext()).savedWalletAddr(dWalletAddr);
+        }
+        BNetApplication.getInstance().BnetServiceJoin(null, dWalletAddr, "", 32);
     }
 
     @Override
