@@ -1,6 +1,7 @@
 package network.b.bnet.utils;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -1614,5 +1615,15 @@ public class Utils {
     public static String dateFormatyyyymmddhhddss(Date date) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return simpleDateFormat.format(date);
+    }
+
+    public static boolean isServiceRunning(Context context,String ServicePackageName) {
+        ActivityManager manager = (ActivityManager) context.getSystemService(context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (ServicePackageName.equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
 }
