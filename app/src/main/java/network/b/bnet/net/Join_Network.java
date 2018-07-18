@@ -3,14 +3,15 @@ package network.b.bnet.net;
 import android.content.Intent;
 import android.net.VpnService;
 import android.os.Bundle;
-import android.os.RemoteException;
 import android.view.View;
 import android.widget.EditText;
+
+import java.util.UUID;
 
 import network.b.bnet.R;
 import network.b.bnet.base.BNetApplication;
 import network.b.bnet.base.BaseActivity;
-import network.b.bnet.utils.ToastTimerShow;
+import network.b.bnet.utils.SharePreferenceMain;
 import network.b.bnet.utils.zxing.activity.CaptureActivity;
 
 public class Join_Network extends BaseActivity {
@@ -41,18 +42,17 @@ public class Join_Network extends BaseActivity {
         join_network.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (main_user_message_txt.getText() == null || main_user_message_txt.getText().toString().length() == 0) {
-                    new ToastTimerShow(getApplicationContext(), getResources().getString(R.string.please_input_word));
-                    return;
-                }
+                //                if (main_user_message_txt.getText() == null || main_user_message_txt.getText().toString().length() == 0) {
+                //                    new ToastTimerShow(getApplicationContext(), getResources().getString(R.string.please_input_word));
+                //                    return;
+                //                }
                 startVPN();
 
             }
         });
     }
 
-    private void startVPN()
-    {
+    private void startVPN() {
         Intent vpnIntent = VpnService.prepare(this);
         if (vpnIntent != null)
             startActivityForResult(vpnIntent, VPN_REQUEST_CODE);//wait user confirmation, will call onActivityResult
@@ -70,29 +70,22 @@ public class Join_Network extends BaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (resultCode == RESULT_OK&&requestCode==ZXING_RET_BINDING_WRISTBAND) {
+        if (resultCode == RESULT_OK && requestCode == ZXING_RET_BINDING_WRISTBAND) {
             Bundle bundle = data.getExtras();
             String scanResult = bundle.getString("result");
             main_user_message_txt.setText(scanResult);
         }
-        if (requestCode == VPN_REQUEST_CODE && resultCode == RESULT_OK)
-        {
-            nWalletAddr = main_user_message_txt.getText().toString();
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        BNetApplication.getInstance().getBnetAidlInterface().join(nWalletAddr,dWalletAddr,deviceAddr,maskBit);
-                    } catch (RemoteException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }).start();
-            try {
-                BNetApplication.getInstance().getBnetAidlInterface().CStartService();
-            } catch (RemoteException e) {
-                e.printStackTrace();
+        if (requestCode == VPN_REQUEST_CODE && resultCode == RESULT_OK) {
+            if (main_user_message_txt.getText() != null)
+                dWalletAddr = main_user_message_txt.getText().toString();
+            if (dWalletAddr.length() < 8) {
+                dWalletAddr = SharePreferenceMain.getSharedPreference(getApplicationContext()).getdWalletAddr();
             }
+            if (dWalletAddr == null || dWalletAddr.length() < 8) {
+                dWalletAddr = UUID.randomUUID().toString();
+                SharePreferenceMain.getSharedPreference(getApplication()).savedWalletAddr(dWalletAddr);
+            }
+            BNetApplication.getInstance().BnetServiceJoin(nWalletAddr, dWalletAddr, deviceAddr, maskBit);
         }
     }
 

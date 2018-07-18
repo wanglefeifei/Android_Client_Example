@@ -127,4 +127,23 @@ public class SharePreferenceMain {
     }
 
 
+    /*
+            * save
+            */
+    public String getdWalletAddr() {
+        String rtns = null;
+        if (sp.contains("getdWalletAddr")) {
+            rtns = sp.getString("getdWalletAddr",null);
+        }
+        return rtns;
+    }
+
+    public boolean savedWalletAddr(String info) {
+
+        edit = sp.edit();
+        edit.putString("getdWalletAddr",info);
+        edit.commit();
+        return true;
+    }
+
 }

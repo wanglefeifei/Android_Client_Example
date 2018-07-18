@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.VpnService;
 import android.os.IBinder;
 import android.os.ParcelFileDescriptor;
+import android.os.Process;
 import android.os.RemoteException;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -228,7 +229,7 @@ public class BnetService extends VpnService {
                             InetAddress RNode33 = InetAddress.getByName("139.162.41.158");
                             bNetT.sendUdpMessage(message, RNode33, 56789);
                             /*
-							   for (int i = 0;i<20;i++)
+                               for (int i = 0;i<20;i++)
 							   {
 								   System.out.println("############### message"+(142+i)+":"+message[142+i]);
 							   }
@@ -292,7 +293,7 @@ public class BnetService extends VpnService {
                 e.printStackTrace();
             }
             nWalletAddr = "172M8JQj7hh1Uf1sYvTf8NtT9vwxJTbRXg";
-            dWalletAddr = "172M8JQj7hh1Uf1sYvTf8NtT9vwxJT1234";
+            //            dWalletAddr = "172M8JQj7hh1Uf1sYvTf8NtT9vwxJT1234";
             maskBit = 32;
             return getTInstance().join(nWalletAddr, dWalletAddr, expectAddress, maskBit);
         }
@@ -315,7 +316,12 @@ public class BnetService extends VpnService {
 
         @Override
         public int leave() throws RemoteException {
-            return getTInstance().leave();
+            int rtn = getTInstance().leave();
+            if (rtn == 0) {
+                //                BnetService.this.stopSelf();
+                Process.killProcess(Process.myPid());
+            }
+            return rtn;
         }
 
         @Override

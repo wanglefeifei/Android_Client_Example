@@ -82,7 +82,7 @@
             android:layout_marginLeft="@dimen/dis_element_to_side"
             android:textSize="@dimen/base_text_size"
             android:layout_toRightOf="@+id/main_net_line_img"
-            android:text="专用网络"/>
+            android:text="alpha测试网"/>
 
         <ImageView
             android:layout_width="wrap_content"

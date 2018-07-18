@@ -1,7 +1,9 @@
 package network.b.bnet;
 
 import android.content.ComponentName;
+import android.content.Intent;
 import android.content.ServiceConnection;
+import android.net.VpnService;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.view.ViewPager;
@@ -44,6 +46,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     private MainActivity_LinkView mainActivity_linkView;
     private MainActivity_MyView mainActivity_myView;
     private MainActivity_Presenter mainActivity_presenter;
+
+
+    private static final int VPN_REQUEST_CODE = 0x0F;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,7 +95,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
         View pageLink = View.inflate(MainActivity.this, R.layout.main_page_link, null);
         View pageMy = View.inflate(MainActivity.this, R.layout.main_page_userinfo, null);
-//        View pageMy = View.inflate(MainActivity.this, R.layout.main_page_link, null);
+        //        View pageMy = View.inflate(MainActivity.this, R.layout.main_page_link, null);
         mainActivity_linkView = new MainActivity_LinkView(pageLink);
         mainActivity_myView = new MainActivity_MyView(pageMy);
         views = new ArrayList<View>();
@@ -168,6 +173,26 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     protected void onResume() {
 
         super.onResume();
+    }
+
+    public void startVPN() {
+        Intent vpnIntent = VpnService.prepare(this);
+        if (vpnIntent != null)
+            startActivityForResult(vpnIntent, VPN_REQUEST_CODE);//wait user confirmation, will call onActivityResult
+        else
+            onActivityResult(VPN_REQUEST_CODE, RESULT_OK, null);
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == VPN_REQUEST_CODE && resultCode == RESULT_OK) {
+            if (mainActivity_presenter != null) {
+                mainActivity_presenter.StartVpvJoin();
+            }
+        }
     }
 
 }

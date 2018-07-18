@@ -8,4 +8,5 @@
     <string name="my">我的</string>
     <string name="link">连接</string>
     <string name="please_input_word">请输入信息</string>
+    <string name="please_pre_joinnetwork">请先加入网络</string>
 </resources>
