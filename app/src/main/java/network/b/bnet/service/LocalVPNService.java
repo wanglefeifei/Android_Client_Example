@@ -28,7 +28,6 @@ import android.net.VpnService;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.FileDescriptor;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.DatagramPacket;
@@ -54,15 +53,34 @@ class Global {
     public static byte[] b_u2ToRNodePort = new byte[2];
     public static boolean HNodeRcvMachDone = false;
     public static boolean RcvDefaultNodeTryOrKeepLive = false;
-    public static int u2DefaultRNodeId = 34;
     public static int deviceid = 208;
     public static boolean hadSendWhereIs = false;
     public static byte[] hefer_header = new byte[136];
+    public static  String 		aesIv = "any";
+    public static  String 		aesKey = "any";
+    public static FileChannel 	vpnOutput;
+    // RNode_Config;
+    public static 	int       	u2RNodeId;
+    public static 	int         u2DefaultRNodeId; //= 34;
+    public static  	String   	strHNodeIp;
+    public static  	int      	u2HNodePort;
+    public static 	int       	u2HNodePort2;
+    public static 	String   	strHeferId;
+    public static 	String   	strSubnetScope;       //exp:10.0.1.0/24
+    public static 	String   	strLanIp; //= "10.208.0.1";
+    public static  	String   	strLanNetMask;
+
+    public static  	String   	strGateway;
+    public static  	String   	dns;
+    public static  	String   	privateKey;
+    public static  	String   	m_walletid;//address
+    public  static    String 		VPN_ADDRESS ;
+    public static 	String 		phoneNum = "17801113110";//需要界面配置
 }
 
 class HeferMsg_PeerRouteInd {
     public static byte u1Result = 0;//=0 send hnode,=1 send rnode33
-    public static byte[] RouteIndCodeStream = new byte[77];//�ṹ��������
+    public static byte[] RouteIndCodeStream = new byte[77];//结构上下码流
     public static int u2DestRNodeId;
     public static long u4DestNet;
     public static long u4DestNetMask;
@@ -278,7 +296,8 @@ class UdpRecvThread {
             public void run() {
                 while (m_IsReceiving) {
                     try {
-                        byte[] inBuff = new byte[2000];  //The max size for packet is 2000
+                        //byte[] inBuff = new byte[2000];  //The max size for packet is 2000
+                        byte[] inBuff = new byte[3000];
                         DatagramPacket inPacket = new DatagramPacket(inBuff, inBuff.length);
                         sock.receive(inPacket);  //block operation
                         evt.onUdpMessage(inBuff);
@@ -390,7 +409,6 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent {
     private String m_hnodeIP = "139.162.103.83";     //IP of H-Node
     private int m_hnodePort1 = 15555;  //Port 1 of H-Node
     private int m_hnodePort2 = 17777;  //Port 2 of H-Node
-    private String m_lanAddr = "10.208.0.1";  //LAN addr get from H-Node
     private String m_dns = "8.8.8.8";         //DNS get from H-Node
     //====================================================================
     //Enum & Defines
@@ -482,38 +500,35 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent {
     public static final int HeferCloudNat_VISIBLE = 0;
     public static final int HeferCloudNat_INVISIBLE = 1;
     public static final int HeferCloudNat_UNREACHABLE = 2;
-    // RNode_Config;
-    private String strHNodeIp;
-    private int u2HNodePort;
-    private int u2HNodePort2;
-    private String strHeferId;
-    private int u2RNodeId;
-    private String strSubnetScope;       //exp:10.0.1.0/24
-    private String strLanIp;
-    private String strLanNetMask;
-    private String strLocalIp;
-    private int u2LocalPort;
-    private int u2DefaultRNodeId;
-    private String strGateway;
-    private String dns;
+
     //RNode_gInfo
     private int RNode_gInfo_u2HNodeHbSeq = 0;//RNode_gInfo.u2HNodeHbSeq = 0;
     private boolean m_connectted = false;
 
+    //parse geted walletid
+    private void  parseWalletid(String resultStr)
+    {
+        String[] resultStrArray = resultStr.split("\\: ");
+        for (int i = 0; i < resultStrArray.length; i++) {
+            System.out.println( resultStrArray[i]);
+        }
+        Global.privateKey = resultStrArray[0];
+        Global.m_walletid = resultStrArray[2];
+    }
     //parse geted para
     private void parsePara(String resultStr) {
         String[] resultStrArray = resultStr.split("\\|");
         for (int i = 0; i < resultStrArray.length; i++) {
             System.out.println(resultStrArray[i]);
         }
-        u2RNodeId = Integer.valueOf(resultStrArray[0]);
-        u2DefaultRNodeId = Integer.valueOf(resultStrArray[1]);
-        strHNodeIp = resultStrArray[2];
-        u2HNodePort = Integer.valueOf(resultStrArray[3]);
-        u2HNodePort2 = Integer.valueOf(resultStrArray[4]);
-        dns = resultStrArray[5];
-        strLanIp = resultStrArray[6];
-        strLanNetMask = resultStrArray[7];
+        Global.u2RNodeId = Integer.valueOf(resultStrArray[0]);
+        Global.u2DefaultRNodeId = Integer.valueOf(resultStrArray[1]);
+        Global.strHNodeIp = resultStrArray[2];
+        Global.u2HNodePort = Integer.valueOf(resultStrArray[3]);
+        Global.u2HNodePort2 = Integer.valueOf(resultStrArray[4]);
+        Global.dns = resultStrArray[5];
+        Global.strLanIp = resultStrArray[6];
+        Global.strLanNetMask = resultStrArray[7];
     }
 
     public static byte[] ipToBytesByInet(String ipAddr) {
@@ -527,10 +542,10 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent {
     private void RNode_sendHeferHeartbeatToDefaultNode(InetAddress NodeAddr, int PeerPort) {
         byte[] heartMsg = new byte[137];
         String heferId = "hefer_r9test";//length:64
-        byte[] strHeferId = heferId.getBytes();//��ά��	//walletid
+        byte[] strHeferId = heferId.getBytes();//二维码	//walletid
         System.arraycopy(strHeferId, 0, heartMsg, 0, strHeferId.length); //walletid
-        int deviceid = Global.deviceid;//u2
-        byte[] u2RNodeId = ByteConvert.ushortToBytes(deviceid);
+        int tNodeid = Global.u2RNodeId ;//u2
+        byte[] u2RNodeId = ByteConvert.ushortToBytes(tNodeid);
         System.arraycopy(u2RNodeId, 0, heartMsg, 64, u2RNodeId.length);
         System.arraycopy(Global.matchedToHeferId, 0, heartMsg, 66, Global.matchedToHeferId.length);
         System.arraycopy(Global.matched_b_u2ToRNodeId, 0, heartMsg, 130, Global.matched_b_u2ToRNodeId.length); // RNode_u2HNodeId
@@ -563,8 +578,8 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent {
             String heferId = "hefer_r9test";//length:64
             byte[] strHeferId = heferId.getBytes();//walletid
             System.arraycopy(strHeferId, 0, heartMsg, 0, strHeferId.length); //walletid
-            int deviceid = Global.deviceid;//u2
-            byte[] u2RNodeId = ByteConvert.ushortToBytes(deviceid);
+            int tNodeid = Global.u2RNodeId;//u2
+            byte[] u2RNodeId = ByteConvert.ushortToBytes(tNodeid);
             System.arraycopy(u2RNodeId, 0, heartMsg, 64, u2RNodeId.length);
             byte[] strToHeferId = new byte[64];
             System.arraycopy(strToHeferId, 0, heartMsg, 66, strToHeferId.length);
@@ -577,7 +592,7 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent {
             byte[] b_u2Seq = ByteConvert.ushortToBytes(u2Seq);
             System.arraycopy(b_u2Seq, 0, heartMsg, 134, b_u2Seq.length); //u2Seq
             //Hnode node ip port need read config from Hnode
-            InetAddress HNode = InetAddress.getByName("47.92.124.231");
+            InetAddress HNode = InetAddress.getByName("162.62.18.231");
             sendUdpMessage(heartMsg, HNode, 15555);
             System.out.println("send  heartbeat to hnode !");
         } catch (IOException e) {
@@ -598,10 +613,43 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent {
     public int join(String nWalletAddr, String dWalletAddr, InetAddress deviceAddr, int maskBit) {
         //join an existed network
         try {
+
+            //private String getWalletid(String  phoneNum )
+            // read walletid from H-Node
+            String walletid = getWalletid(Global.phoneNum);
+            System.out.println("walletid:"+walletid);
+            while(walletid == "")
+            {
+                walletid = getWalletid(Global.phoneNum);
+                try {
+                    Thread.sleep (1 * 1000);
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+            parseWalletid(walletid);
+            System.out.println("m_walletid:"+Global.m_walletid);
+            System.out.println("Global.privateKey:"+Global.privateKey);
             // read configuratin from H-Node
-            //String config = getConfiguration("dsfvadsiuhfia");
-            //System.out.println(config);
-            //parsePara(config);
+            System.out.println("m_walletid:"+Global.m_walletid);
+            String config = getConfiguration(Global.m_walletid);
+            System.out.println("config:"+config);
+            while(config == "")
+            {
+                config = getConfiguration(walletid);
+                try {
+                    Thread.sleep (1 * 1000);
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+            parsePara(config);
+            System.out.println("###Global.u2RNodeId:"+Global.u2RNodeId);
+            System.out.println("###Global.u2DefaultRNodeId:"+Global.u2DefaultRNodeId);
+            System.out.println("###Global.strLanIp:"+Global.strLanIp);
+            System.out.println("###Global.strHNodeIp:"+Global.strHNodeIp);
             //save to m_hnodeIP ...
             m_status = Configed;
             // Start listening to H-node
@@ -612,8 +660,8 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent {
             String heferId = "hefer_r9test";//length:64
             byte[] strHeferId = heferId.getBytes();//��ά��	//walletid
             System.arraycopy(strHeferId, 0, registerMsg, 0, strHeferId.length); //walletid
-            int deviceid = Global.deviceid;//u2
-            byte[] u2RNodeId = ByteConvert.ushortToBytes(deviceid);
+            int tNodeid = Global.u2RNodeId;//u2
+            byte[] u2RNodeId = ByteConvert.ushortToBytes(tNodeid);
             System.arraycopy(u2RNodeId, 0, registerMsg, 64, u2RNodeId.length);
             byte[] strToHeferId = new byte[64];
             System.arraycopy(strToHeferId, 0, registerMsg, 66, strToHeferId.length);
@@ -625,9 +673,10 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent {
             int u2Seq = 0;//u2
             byte[] b_u2Seq = ByteConvert.ushortToBytes(u2Seq);
             System.arraycopy(b_u2Seq, 0, registerMsg, 134, b_u2Seq.length); //u2Seq
-            long iplong = IPUtil.ipToLong("10.208.0.0");
-            //long u4Subnet = iplong & 32;
-            long u4Subnet = 0xad00001; //0xad00001<- meng
+            System.out.println("!!!!!!!Global.strLanIp:"+Global.strLanIp);
+            long iplong = IPUtil.ipToLong(Global.strLanIp);
+            long u4Subnet = iplong & 0xffffffff;
+            //long u4Subnet = 0xad00001; //0xad00001<- meng  10.208.0.1
             byte[] b_u4Subnet = ByteConvert.uintToBytes(u4Subnet);
             System.arraycopy(b_u4Subnet, 0, registerMsg, 136, b_u4Subnet.length);
             //long u4SubnetMask = 32;//engineer liu gived 0xffffffff<- meng
@@ -636,7 +685,7 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent {
             System.arraycopy(b_u4SubnetMask, 0, registerMsg, 140, b_u4SubnetMask.length);
             registerMsg[144 + 18] = 1;
             registerMsg[145 + 18] = 0;//hnode handle tnode special
-            InetAddress HNode = InetAddress.getByName("47.92.124.231");//should get from config
+            InetAddress HNode = InetAddress.getByName("162.62.18.231");//should get from config
             sendUdpMessage(registerMsg, HNode, 15555);
             sendUdpMessage(registerMsg, HNode, 17777);
             m_status = Connectting;
@@ -685,7 +734,60 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent {
         //get the status of the connection
         return m_status;
     }
-
+    //get walletid from http://162.62.16.175/w.php?action=create&rand=sdfsdfs
+    private String getWalletid(String  phoneNum )
+    {
+        HttpURLConnection httpURLConnection = null;
+        InputStream       in = null;
+        String            config = "";
+        //start my thread
+        try
+        {
+            URL url = new URL("http://162.62.16.175/w.php?action=create&rand=" + phoneNum);
+            httpURLConnection = ( HttpURLConnection) url.openConnection();
+            httpURLConnection.setConnectTimeout(5000);
+            httpURLConnection.setReadTimeout(5000);
+            int responsecode = httpURLConnection.getResponseCode();
+            if(responsecode == 200)
+            {
+                in = httpURLConnection.getInputStream();
+                byte[] bs = new byte[1024];
+                int total = -1;
+                while((total=in.read(bs)) != -1)
+                {
+                    String part = new String (bs,0,total);
+                    config = config + part;
+                }
+            }
+        }
+        catch (MalformedURLException e)
+        {
+            System.out.println("URL format error");
+        }
+        catch (IOException e)
+        {
+            System.out.println("Connection error,get configuration failed");
+        }
+        finally
+        {
+            if(in != null)
+            {
+                try
+                {
+                    in.close();
+                }
+                catch (IOException e)
+                {
+                    System.out.println("inputStream for configuration closed");
+                }
+            }
+            if(httpURLConnection != null)
+            {
+                httpURLConnection.disconnect();
+            }
+        }
+        return config;  //private key and walletid(address)
+    }
     //get config from http://d.vin/h/t.php?w=xxxxxx
     private String getConfiguration(String walletid) {
         HttpURLConnection httpURLConnection = null;
@@ -735,7 +837,14 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent {
             System.out.println("send UDP message failed");
         }
     }
+    public static String bytesToHexFun3(byte[] bytes) {
+        StringBuilder buf = new StringBuilder(bytes.length * 2);
+        for(byte b : bytes) {
+            buf.append(String.format("%02x", new Integer(b & 0xff)));
+        }
 
+        return buf.toString();
+    }
     public void onUdpMessage(byte[] data) {
         try {
             InputStream in_withcode;
@@ -833,8 +942,8 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent {
             String heferId = "hefer_r9test";//length:64
             byte[] strHeferId = heferId.getBytes();    //walletid
             System.arraycopy(strHeferId, 0, matchdoneMsg, 0, strHeferId.length); //walletid
-            int deviceid = Global.deviceid;//u2
-            byte[] u2RNodeId = ByteConvert.ushortToBytes(deviceid);
+            int tNodeid = Global.u2RNodeId;//u2
+            byte[] u2RNodeId = ByteConvert.ushortToBytes(tNodeid);
             System.arraycopy(u2RNodeId, 0, matchdoneMsg, 64, u2RNodeId.length);
             byte[] strToHeferId = new byte[64];
             System.arraycopy(strToHeferId, 0, matchdoneMsg, 66, strToHeferId.length);
@@ -869,8 +978,8 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent {
             String heferId = "hefer_r9test";//length:64
             byte[] strHeferId = heferId.getBytes();    //walletid
             System.arraycopy(strHeferId, 0, matchdoneMsg, 0, strHeferId.length); //walletid
-            int deviceid = Global.deviceid;//u2
-            byte[] u2RNodeId = ByteConvert.ushortToBytes(deviceid);
+            int tNodeid = Global.u2RNodeId;//u2
+            byte[] u2RNodeId = ByteConvert.ushortToBytes(tNodeid);
             System.arraycopy(u2RNodeId, 0, matchdoneMsg, 64, u2RNodeId.length);
             byte[] strToHeferId = new byte[64];
             System.arraycopy(strToHeferId, 0, matchdoneMsg, 66, strToHeferId.length);
@@ -887,7 +996,7 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent {
             System.arraycopy(Global.matched_b_u2ToRNodeId, 0, matchdoneMsg, 137 + 64, Global.matched_b_u2ToRNodeId.length); //64
             InetAddress HNode = null;
             try {
-                HNode = InetAddress.getByName("47.92.124.231");
+                HNode = InetAddress.getByName("162.62.18.231");
             } catch (UnknownHostException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -905,18 +1014,26 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent {
             HeferMsg_PeerRouteInd.u1Result = 1;//when tun receive pack forward
             System.arraycopy(data, 137, HeferMsg_PeerRouteInd.RouteIndCodeStream, 0, 77);//struct HeferMsg_PeerRouteInd
             //save over
-        } else if (data[133] == HeferPeer_DATA_IND) {
+        } else if (data[133] == HeferPeer_DATA_IND) {//nowrussian
             //decrypt data then write tun
+            //aesCbcNoPaddingDecrypt(byte[] sSrc, String aesKey, String aesIV)
             //send msg to tun
             if (Global.vpnFileDescriptor == null) {
                 System.out.println("Global.vpnFileDescriptor is null,can't write");
             } else {
-                byte[] data1 = new byte[data.length - 136 - 6];
-                System.arraycopy(data, 142, data1, 0, data1.length);//struct HeferMsg_PeerRouteInd
-                FileChannel vpnOutput = new FileOutputStream(Global.vpnFileDescriptor).getChannel();
-                ByteBuffer bufferFromNetwork = ByteBuffer.wrap(data1);
+                byte [] data_dec = new byte[data.length-136];
+                System.arraycopy(data, 136, data_dec, 0,data_dec.length);//struct HeferMsg_PeerRouteInd
+                byte [] data_deced = AesEncryptUtil.aesCbcNoPaddingDecrypt(data_dec, Global.aesKey,Global.aesIv);
+                byte[] b_u2MsgLong =  new byte[2];
+                System.arraycopy(data_deced, 0,b_u2MsgLong, 0,b_u2MsgLong.length);
+                int longOfMsg =  ByteConvert.bytesToUshort(b_u2MsgLong);
+                longOfMsg = longOfMsg - 2;
+                byte [] data_write = new byte[longOfMsg];
+                System.arraycopy(data_deced, 6,data_write, 0,data_write.length);
+                //FileChannel vpnOutput = new FileOutputStream(Global.vpnFileDescriptor).getChannel();
+                ByteBuffer bufferFromNetwork = ByteBuffer.wrap(data_write);
                 try {
-                    vpnOutput.write(bufferFromNetwork);
+                    Global.vpnOutput.write(bufferFromNetwork);
                 } catch (IOException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -959,7 +1076,7 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent {
             }
             //10s every time
             try {
-                Thread.sleep(10 * 1000);
+                Thread.sleep(5 * 1000);
             } catch (InterruptedException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
