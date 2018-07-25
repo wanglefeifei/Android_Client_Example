@@ -28,7 +28,7 @@ import network.b.bnet.R;
 
 public class BnetService extends VpnService {
     private static final String TAG = BnetService.class.getSimpleName();
-    private static final String VPN_ADDRESS = "10.208.0.1"; // Only IPv4 support for now
+    //private static  String VPN_ADDRESS = "10.208.0.1"; // Only IPv4 support for now
     private static final String VPN_ROUTE = "0.0.0.0"; // Intercept everything
     // private static final String VPN_ROUTE = "10.0.0.0"; // Intercept everything
     public static final String BROADCAST_VPN_STATE = "network.b.VPN_STATE";
@@ -153,7 +153,8 @@ public class BnetService extends VpnService {
         public void run() {
             Log.i(TAG, "Started");
             FileChannel vpnInput = new FileInputStream(vpnFileDescriptor).getChannel();//vpnInterface.getFileDescriptor()
-            FileChannel vpnOutput = new FileOutputStream(vpnFileDescriptor).getChannel();
+            Global.vpnOutput = new FileOutputStream(vpnFileDescriptor).getChannel();
+
             try {
                 ByteBuffer bufferToNetwork = null;
                 boolean dataSent = true;
@@ -174,8 +175,8 @@ public class BnetService extends VpnService {
                             String heferId = "hefer_r9test";//length:64
                             byte[] strHeferId = heferId.getBytes();//walletid
                             System.arraycopy(strHeferId, 0, whereIsMsg, 0, strHeferId.length); //walletid
-                            int deviceid = Global.deviceid;//u2
-                            byte[] u2RNodeId = ByteConvert.ushortToBytes(deviceid);
+                            int tNodeid = Global.u2RNodeId;//u2
+                            byte[] u2RNodeId = ByteConvert.ushortToBytes(tNodeid);
                             System.arraycopy(u2RNodeId, 0, whereIsMsg, 64, u2RNodeId.length);
                             byte[] strToHeferId = new byte[64];
                             System.arraycopy(strToHeferId, 0, whereIsMsg, 66, strToHeferId.length);
@@ -194,13 +195,14 @@ public class BnetService extends VpnService {
                             byte[] b_u2DefaultRNodeId = ByteConvert.ushortToBytes(u2DefaultRNodeId);
                             System.arraycopy(b_u2DefaultRNodeId, 0, whereIsMsg, 140, b_u2DefaultRNodeId.length); //u2Seq
                             //dst ip:172.217.26.36
-                            InetAddress HNode = InetAddress.getByName("47.92.124.231");
+                            InetAddress HNode = InetAddress.getByName("162.62.18.231");
                             bNetT.sendUdpMessage(whereIsMsg, HNode, 15555);
                             System.out.println("send whereis to hnode!");
                             Global.hadSendWhereIs = true;
                         }
-                        if (HeferMsg_PeerRouteInd.u1Result == 1) {
-                            //data encrypt then send rnode33
+                        if (HeferMsg_PeerRouteInd.u1Result == 1)//nowrussian
+                        {
+                            //data encrypt then send rnode34
                             AESCrypt aesobject;
                             //System.out.println("############ start encrypt data");
                             //SecretKeySpec key =  AESCrypt.generateKey("123456");
@@ -225,9 +227,14 @@ public class BnetService extends VpnService {
                             System.arraycopy(HeferMsg_PeerRouteInd.RouteIndCodeStream, 10, Global.hefer_header, 66, 64);
                             //lpq;
                             System.arraycopy(Global.hefer_header, 0, message, 0, 136); //u2Seq
-                            //AESCrypt.encrypt( key, iv,  message);
+                            byte[] message_payload = new byte[remaining + 6];
+                            System.arraycopy(message, 136, message_payload, 0, remaining + 6);
+                            byte[] message_payload_enc = AesEncryptUtil.aesCbcNoPaddingEncrypt(message_payload, Global.aesKey, Global.aesIv);
+                            byte[] message_send = new byte[136 + message_payload_enc.length];
+                            System.arraycopy(Global.hefer_header, 0, message_send, 0, 136); //u2Seq
+                            System.arraycopy(message_payload_enc, 0, message_send, 136, message_payload_enc.length);
                             InetAddress RNode33 = InetAddress.getByName("139.162.41.158");
-                            bNetT.sendUdpMessage(message, RNode33, 56789);
+                            bNetT.sendUdpMessage(message_send, RNode33, 56789);
                             /*
                                for (int i = 0;i<20;i++)
 							   {
@@ -247,7 +254,7 @@ public class BnetService extends VpnService {
                     if (bufferFromNetwork != null) {
                         bufferFromNetwork.flip();
                         while (bufferFromNetwork.hasRemaining())
-                            vpnOutput.write(bufferFromNetwork);
+                            Global.vpnOutput.write(bufferFromNetwork);
                         dataReceived = true;
                         ByteBufferPool.release(bufferFromNetwork);
                     } else {
@@ -263,7 +270,7 @@ public class BnetService extends VpnService {
             } catch (IOException e) {
                 Log.w(TAG, e.toString(), e);
             } finally {
-                closeResources(vpnInput, vpnOutput);
+                closeResources(vpnInput, Global.vpnOutput);
             }
         }
     }
@@ -295,6 +302,7 @@ public class BnetService extends VpnService {
             nWalletAddr = "172M8JQj7hh1Uf1sYvTf8NtT9vwxJTbRXg";
             //            dWalletAddr = "172M8JQj7hh1Uf1sYvTf8NtT9vwxJT1234";
             maskBit = 32;
+            Global.phoneNum = dWalletAddr;
             return getTInstance().join(nWalletAddr, dWalletAddr, expectAddress, maskBit);
         }
 
@@ -366,11 +374,12 @@ public class BnetService extends VpnService {
                 @Override
                 public void run() {
                     try {
-                        Thread.sleep(3 * 1000);
+                        Thread.sleep(5 * 1000);
                     } catch (InterruptedException e1) {
                         // TODO Auto-generated catch block
                         e1.printStackTrace();
                     }
+                    Global.VPN_ADDRESS = Global.strLanIp;
                     startVpn();
                 }
             }).start();
@@ -381,7 +390,8 @@ public class BnetService extends VpnService {
     private void setupVPN() {
         if (vpnInterface == null) {
             Builder builder = new Builder();
-            builder.addAddress(VPN_ADDRESS, 32);
+            System.out.println(" Global.VPN_ADDRESS:" + Global.VPN_ADDRESS);
+            builder.addAddress(Global.VPN_ADDRESS, 32);
             builder.addRoute(VPN_ROUTE, 0);
             builder.setMtu(1300);
             builder.addDnsServer("8.8.8.8");//need read from config msg
