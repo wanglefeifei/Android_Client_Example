@@ -17,6 +17,7 @@
 
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+
     <application
         android:name=".base.BNetApplication"
         android:allowBackup="true"
@@ -35,6 +36,9 @@
             android:permission="android.permission.BIND_VPN_SERVICE"
             android:process=":mine.bnet">
         </service>
+        <service
+            android:name=".service.LocalVPNService"
+            android:permission="android.permission.BIND_VPN_SERVICE"></service>
 
         <activity android:name=".userinfo.UserMain">
         </activity>

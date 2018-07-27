@@ -1,8 +1,8 @@
 package network.b.bnet.service;
 
 import android.app.PendingIntent;
+import android.app.Service;
 import android.content.Intent;
-import android.net.VpnService;
 import android.os.IBinder;
 import android.os.ParcelFileDescriptor;
 import android.os.Process;
@@ -22,11 +22,10 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.Selector;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
-import network.b.bnet.R;
+import network.b.bnet.service.bean.Join;
 
-public class BnetService extends VpnService {
+public class BnetService extends Service {
     private static final String TAG = BnetService.class.getSimpleName();
     //private static  String VPN_ADDRESS = "10.208.0.1"; // Only IPv4 support for now
     private static final String VPN_ROUTE = "0.0.0.0"; // Intercept everything
@@ -83,7 +82,7 @@ public class BnetService extends VpnService {
 
     private void startVpn() {
         //protect m_udpSocket not be block by tun
-        protect(Global.m_udpSocket);
+        //        protect(Global.m_udpSocket);
         //start VPN
         isRunning = true;
         setupVPN();
@@ -93,11 +92,11 @@ public class BnetService extends VpnService {
             deviceToNetworkUDPQueue = new ConcurrentLinkedQueue<Packet>();
             deviceToNetworkTCPQueue = new ConcurrentLinkedQueue<Packet>();
             networkToDeviceQueue = new ConcurrentLinkedQueue<ByteBuffer>();
-            executorService = Executors.newFixedThreadPool(5);
-            executorService.submit(new UDPInput(networkToDeviceQueue, udpSelector));
-            executorService.submit(new UDPOutput(deviceToNetworkUDPQueue, udpSelector, this));
-            executorService.submit(new TCPInput(networkToDeviceQueue, tcpSelector));
-            executorService.submit(new TCPOutput(deviceToNetworkTCPQueue, networkToDeviceQueue, tcpSelector, this));
+            //            executorService = Executors.newFixedThreadPool(5);
+            //            executorService.submit(new UDPInput(networkToDeviceQueue, udpSelector));
+            //            executorService.submit(new UDPOutput(deviceToNetworkUDPQueue, udpSelector, this));
+            //            executorService.submit(new TCPInput(networkToDeviceQueue, tcpSelector));
+            //            executorService.submit(new TCPOutput(deviceToNetworkTCPQueue, networkToDeviceQueue, tcpSelector, this));
             //build vpn
             Global.vpnFileDescriptor = vpnInterface.getFileDescriptor();
             executorService.submit(new VPNRunnable(Global.vpnFileDescriptor,
@@ -279,31 +278,40 @@ public class BnetService extends VpnService {
 
         @Override
         public int create(String nWalletAddr, String masterAddr, int maskBit) throws RemoteException {
-            InetAddress inetAddress = null;
-            try {
-                inetAddress = InetAddress.getByName(masterAddr);
-            } catch (UnknownHostException e) {
-                e.printStackTrace();
-            }
-            return getTInstance().create(nWalletAddr, inetAddress, maskBit);
+            //            InetAddress inetAddress = null;
+            //            try {
+            //                inetAddress = InetAddress.getByName(masterAddr);
+            //            } catch (UnknownHostException e) {
+            //                e.printStackTrace();
+            //            }
+            //            return getTInstance().create(nWalletAddr, inetAddress, maskBit);
+            return 0;
         }
 
 
         @Override
         public int join(String nWalletAddr, String dWalletAddr, String deviceAddr, int maskBit) throws RemoteException {
-            byte ip[] = new byte[]{0, 0, 0, 0};
-            InetAddress expectAddress = null;
-            try {
-                expectAddress = InetAddress.getByAddress(ip);
-            } catch (UnknownHostException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            nWalletAddr = "172M8JQj7hh1Uf1sYvTf8NtT9vwxJTbRXg";
-            //            dWalletAddr = "172M8JQj7hh1Uf1sYvTf8NtT9vwxJT1234";
-            maskBit = 32;
-            Global.phoneNum = dWalletAddr;
-            return getTInstance().join(nWalletAddr, dWalletAddr, expectAddress, maskBit);
+            //            byte ip[] = new byte[]{0, 0, 0, 0};
+            //            InetAddress expectAddress = null;
+            //            try {
+            //                expectAddress = InetAddress.getByAddress(ip);
+            //            } catch (UnknownHostException e) {
+            //                // TODO Auto-generated catch block
+            //                e.printStackTrace();
+            //            }
+            //            nWalletAddr = "172M8JQj7hh1Uf1sYvTf8NtT9vwxJTbRXg";
+            //            //            dWalletAddr = "172M8JQj7hh1Uf1sYvTf8NtT9vwxJT1234";
+            //            maskBit = 32;
+            //            Global.phoneNum = dWalletAddr;
+            //            return getTInstance().join(nWalletAddr, dWalletAddr, expectAddress, maskBit);
+            Join.nWalletAddr = nWalletAddr;
+            Join.dWalletAddr = dWalletAddr;
+            Join.deviceAddr = deviceAddr;
+            Join.maskBit = maskBit;
+            Intent intent = new Intent(getApplicationContext(), LocalVPNService.class);
+            Log.e(TAG + "test", "11111111111111111");
+            startService(intent);
+            return 0;
         }
 
         @Override
@@ -324,12 +332,13 @@ public class BnetService extends VpnService {
 
         @Override
         public int leave() throws RemoteException {
-            int rtn = getTInstance().leave();
-            if (rtn == 0) {
-                //                BnetService.this.stopSelf();
-                Process.killProcess(Process.myPid());
-            }
-            return rtn;
+            //            int rtn = getTInstance().leave();
+            //            if (rtn == 0) {
+            //                //                BnetService.this.stopSelf();
+            //                Process.killProcess(Process.myPid());
+            //            }
+            Process.killProcess(Process.myPid());
+            return 0;
         }
 
         @Override
@@ -370,32 +379,32 @@ public class BnetService extends VpnService {
 
         @Override
         public void CStartService() throws RemoteException {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        Thread.sleep(5 * 1000);
-                    } catch (InterruptedException e1) {
-                        // TODO Auto-generated catch block
-                        e1.printStackTrace();
-                    }
-                    Global.VPN_ADDRESS = Global.strLanIp;
-                    startVpn();
-                }
-            }).start();
+            //            new Thread(new Runnable() {
+            //                @Override
+            //                public void run() {
+            //                    try {
+            //                        Thread.sleep(5 * 1000);
+            //                    } catch (InterruptedException e1) {
+            //                        // TODO Auto-generated catch block
+            //                        e1.printStackTrace();
+            //                    }
+            //                    Global.VPN_ADDRESS = Global.strLanIp;
+            //                    startVpn();
+            //                }
+            //            }).start();
         }
     }
 
 
     private void setupVPN() {
         if (vpnInterface == null) {
-            Builder builder = new Builder();
-            System.out.println(" Global.VPN_ADDRESS:" + Global.VPN_ADDRESS);
-            builder.addAddress(Global.VPN_ADDRESS, 32);
-            builder.addRoute(VPN_ROUTE, 0);
-            builder.setMtu(1300);
-            builder.addDnsServer("8.8.8.8");//need read from config msg
-            vpnInterface = builder.setSession(getString(R.string.app_name)).setConfigureIntent(pendingIntent).establish();
+            //            Builder builder = new Builder();
+            //            System.out.println(" Global.VPN_ADDRESS:" + Global.VPN_ADDRESS);
+            //            builder.addAddress(Global.VPN_ADDRESS, 32);
+            //            builder.addRoute(VPN_ROUTE, 0);
+            //            builder.setMtu(1300);
+            //            builder.addDnsServer("8.8.8.8");//need read from config msg
+            //            vpnInterface = builder.setSession(getString(R.string.app_name)).setConfigureIntent(pendingIntent).establish();
         }
         // protect(1);
     }

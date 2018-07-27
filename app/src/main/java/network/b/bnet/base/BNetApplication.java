@@ -61,10 +61,10 @@ public class BNetApplication extends Application {
     }
 
     public void DestoryBnetService() {
-        if (serviceConnection != null && serviceBind) {
-            unbindService(serviceConnection);
-            serviceBind = false;
-        }
+//        if (serviceConnection != null && serviceBind) {
+//            unbindService(serviceConnection);
+//            serviceBind = false;
+//        }
         if (bnetAidlInterface != null) {
             try {
                 bnetAidlInterface.leave();
