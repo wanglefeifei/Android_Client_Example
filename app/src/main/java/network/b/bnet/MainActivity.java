@@ -135,7 +135,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 break;
             case 1:
                 setTitle_Title_Word(getResources().getString(R.string.my));
-                iv_setting.setImageResource(R.mipmap.main_my_light_icon);
+                iv_setting.setImageResource(R.mipmap.main_my_new_light_icon);
                 tv_setting.setTextColor(getResources().getColor(R.color.base_blue_color));
                 break;
         }
@@ -144,7 +144,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     private void restartBotton() {
         iv_home.setImageResource(R.mipmap.main_link_gray_icon);
         iv_setting.setImageResource(R.mipmap.main_my_gray_icon);
-
 
         tv_home.setTextColor(getResources().getColor(R.color.base_gray_color));
         tv_setting.setTextColor(getResources().getColor(R.color.base_gray_color));

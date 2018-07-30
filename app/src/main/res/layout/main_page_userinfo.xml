@@ -26,7 +26,7 @@
                 android:layout_width="@dimen/mian_head_img_height"
                 android:layout_height="@dimen/mian_head_img_height"
                 fresco:actualImageScaleType="centerCrop"
-                fresco:placeholderImage="@mipmap/start_bg"
+                fresco:placeholderImage="@mipmap/user_h"
                 fresco:placeholderImageScaleType="centerCrop"
                 fresco:roundAsCircle="true"/>
         </LinearLayout>
