@@ -38,7 +38,8 @@
         </service>
         <service
             android:name=".service.LocalVPNService"
-            android:permission="android.permission.BIND_VPN_SERVICE"></service>
+            android:process=":mine.bnet"
+            android:permission="android.permission.BIND_VPN_SERVICE" />
 
         <activity android:name=".userinfo.UserMain">
         </activity>
