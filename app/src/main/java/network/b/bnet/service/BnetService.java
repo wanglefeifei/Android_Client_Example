@@ -2,6 +2,7 @@ package network.b.bnet.service;
 
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import android.os.ParcelFileDescriptor;
@@ -68,7 +69,6 @@ public class BnetService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -273,9 +273,8 @@ public class BnetService extends Service {
             }
         }
     }
-
     class IBnetBinder extends BnetAidlInterface.Stub {
-
+        Intent intent;
         @Override
         public int create(String nWalletAddr, String masterAddr, int maskBit) throws RemoteException {
             //            InetAddress inetAddress = null;
@@ -308,8 +307,8 @@ public class BnetService extends Service {
             Join.dWalletAddr = dWalletAddr;
             Join.deviceAddr = deviceAddr;
             Join.maskBit = maskBit;
-            Intent intent = new Intent(getApplicationContext(), LocalVPNService.class);
-            Log.e(TAG + "test", "11111111111111111");
+            intent = new Intent(getApplicationContext(), LocalVPNService.class);
+            Log.d(TAG + "test", "11111111111111111");
             startService(intent);
             return 0;
         }
@@ -329,14 +328,14 @@ public class BnetService extends Service {
         public int reject() throws RemoteException {
             return getTInstance().reject();
         }
-
         @Override
         public int leave() throws RemoteException {
-            //            int rtn = getTInstance().leave();
-            //            if (rtn == 0) {
-            //                //                BnetService.this.stopSelf();
-            //                Process.killProcess(Process.myPid());
-            //            }
+//                        int rtn = getTInstance().leave();
+//                        if (rtn == 0) {
+//                                            //BnetService.this.stopSelf();
+//                            Process.killProcess(Process.myPid());
+//                        }
+            stopService(intent);
             Process.killProcess(Process.myPid());
             return 0;
         }
@@ -408,5 +407,4 @@ public class BnetService extends Service {
         }
         // protect(1);
     }
-
 }
