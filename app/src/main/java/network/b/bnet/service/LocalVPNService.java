@@ -57,6 +57,7 @@ import java.util.concurrent.Executors;
 
 import network.b.bnet.R;
 import network.b.bnet.service.bean.Join;
+import network.b.bnet.utils.LogUtils;
 
 class Global{
 	public static FileDescriptor 	vpnFileDescriptor;
@@ -311,10 +312,10 @@ class UdpRecvThread
 					}
 					catch (IOException e)
 					{
-						System.out.println("recv UDP socket failed");
+						LogUtils.d("debug","recv UDP socket failed");
 					}
 				}
-				System.out.println("UdpRecvThread is stopped.");
+				LogUtils.d("debug","UdpRecvThread is stopped.");
 			}
 		}).start();
 	}
@@ -367,10 +368,10 @@ class TunRecvThread extends VpnService
 					}
 					catch (IOException e)
 					{
-			    			System.out.println("recv TUN socket failed");
+			    			LogUtils.d("debug","recv TUN socket failed");
 					}
 				}
-				System.out.println("TunRecvThread is stopped.");
+				LogUtils.d("debug","TunRecvThread is stopped.");
 			}
 		}).start();
 
@@ -391,7 +392,7 @@ class TunRecvThread extends VpnService
 			}
 			catch (IOException e)
 			{
-				System.out.println("send TUN socket failed");
+				LogUtils.d("debug","send TUN socket failed");
 			}
 		}
 	}
@@ -516,7 +517,7 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent
 		String[] resultStrArray = resultStr.split("\\: ");
 		/*
 		for (int i = 0; i < resultStrArray.length; i++) {
-			System.out.println( resultStrArray[i]);
+			LogUtils.d("debug", resultStrArray[i]);
 		}
 		*/
 		Global.m_walletid = resultStrArray[2];
@@ -529,7 +530,7 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent
 		String[] resultStrArray = resultStr.split("\\|");
 		/*
 		for (int i = 0; i < resultStrArray.length; i++) {
-			System.out.println( resultStrArray[i]);
+			LogUtils.d("debug", resultStrArray[i]);
 		}
 		*/
 		Global.u2RNodeId = Integer.valueOf(resultStrArray[0]);
@@ -568,7 +569,7 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent
 		System.arraycopy(heartMsg, 0, Global.hefer_header, 0,136); //u2Seq
 		//defaut node ip port need read from Hnode's msg
 		sendUdpMessage (heartMsg, NodeAddr, PeerPort);
-		System.out.println("send  heartbeat to defaultnode "+Global.u2DefaultRNodeId + " PeerPort:"+PeerPort);
+		LogUtils.d("debug","send  heartbeat to defaultnode "+Global.u2DefaultRNodeId + " PeerPort:"+PeerPort);
 	}
 	private void RNode_sendHeferHeartbeatToHNode(int heartbeatseq)
 	{
@@ -594,11 +595,11 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent
 			//Hnode node ip port need read config from Hnode
 			InetAddress HNode =InetAddress.getByName(Global.strHNodeIp);
 			sendUdpMessage (heartMsg, HNode, Global.u2HNodePort);
-			System.out.println("send  heartbeat to hnode! heartbeat seq:"+ heartbeatseq);
+			LogUtils.d("debug","send  heartbeat to hnode! heartbeat seq:"+ heartbeatseq);
 		}
 		catch (IOException e)
 		{
-			System.out.println("send  heartbeat to hnode failed");
+			LogUtils.d("debug","send  heartbeat to hnode failed");
 		}
 	}
 	//create a new network named as nWalletAddr, and the master's IP is masterAddr/maskBit.
@@ -613,7 +614,7 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent
 	{	//private String getWalletid(String  phoneNum )
 		// read walletid from H-Node
 		Global.idAndKey = getWalletid(Global.phoneNum);
-		System.out.println("Global.idAndKey:"+Global.idAndKey);
+		LogUtils.d("debug","Global.idAndKey:"+Global.idAndKey);
 		while(Global.idAndKey == "")
 		{
 			Global.idAndKey = getWalletid(Global.phoneNum);
@@ -625,12 +626,12 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent
 			}
 		}
 		parseWalletid(Global.idAndKey);//idAndKey = private key + address(wallet id)
-		System.out.println("Global.m_walletid:"+Global.m_walletid);
-		System.out.println("Global.privateKey:"+Global.privateKey);
+		LogUtils.d("debug","Global.m_walletid:"+Global.m_walletid);
+		LogUtils.d("debug","Global.privateKey:"+Global.privateKey);
 		// read configuratin from H-Node
-		System.out.println("m_walletid:"+Global.m_walletid);
+		LogUtils.d("debug","m_walletid:"+Global.m_walletid);
 		Global.configPara = getConfiguration(Global.m_walletid);
-		System.out.println("config:"+Global.configPara);
+		LogUtils.d("debug","config:"+Global.configPara);
 		while(Global.configPara == "")
 		{
 			Global.configPara = getConfiguration(Global.m_walletid);
@@ -642,10 +643,10 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent
 			}
 		}
 		parsePara(Global.configPara);
-		System.out.println("###Global.u2RNodeId:"+Global.u2RNodeId);
-		System.out.println("###Global.u2DefaultRNodeId:"+Global.u2DefaultRNodeId);
-		System.out.println("###Global.strLanIp:"+Global.strLanIp);
-		System.out.println("###Global.strHNodeIp:"+Global.strHNodeIp);
+		LogUtils.d("debug","###Global.u2RNodeId:"+Global.u2RNodeId);
+		LogUtils.d("debug","###Global.u2DefaultRNodeId:"+Global.u2DefaultRNodeId);
+		LogUtils.d("debug","###Global.strLanIp:"+Global.strLanIp);
+		LogUtils.d("debug","###Global.strHNodeIp:"+Global.strHNodeIp);
 		//save to m_hnodeIP ...
 		m_status = Configed;
 
@@ -679,7 +680,7 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent
 						int u2Seq = 0;//u2
 						byte[] b_u2Seq  = ByteConvert.ushortToBytes(u2Seq);
 						System.arraycopy(b_u2Seq, 0, registerMsg, 134,b_u2Seq.length); //u2Seq
-						System.out.println("!!!!!!!Global.strLanIp:"+Global.strLanIp);
+						LogUtils.d("debug","!!!!!!!Global.strLanIp:"+Global.strLanIp);
 						long iplong = IPUtil.ipToLong(Global.strLanIp);
 						long u4Subnet = iplong & 0xffffffff;
 						//long u4Subnet = 0xad00001; //0xad00001<- meng  10.208.0.1
@@ -695,12 +696,12 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent
 						sendUdpMessage (registerMsg, HNode, Global.u2HNodePort);
 						sendUdpMessage (registerMsg, HNode, Global.u2HNodePort2);
 						m_status = Connectting;
-						System.out.println("send register msg to hnode");
+						LogUtils.d("debug","send register msg to hnode");
 						//Thread.sleep (1 * 1000);
 					}
 					catch (IOException e)
 					{
-						System.out.println("send register msg failed");
+						LogUtils.d("debug","send register msg failed");
 					}
 
 					try {
@@ -732,7 +733,7 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent
 		}
 		catch (IOException e)
 		{
-			System.out.println("create UDP socket failed");
+			LogUtils.d("debug","create UDP socket failed");
 			return 1;
 		}
 		return 0;
@@ -750,7 +751,7 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent
 			//private String getWalletid(String  phoneNum )
 			// read walletid from H-Node
 			Global.idAndKey = getWalletid(Global.phoneNum);
-			System.out.println("Global.idAndKey:"+Global.idAndKey);
+			LogUtils.d("debug","Global.idAndKey:"+Global.idAndKey);
 			while(Global.idAndKey == "")
 			{
 				Global.idAndKey = getWalletid(Global.phoneNum);
@@ -762,12 +763,12 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent
 				}
 			}
 			parseWalletid(Global.idAndKey);//idAndKey = private key + address(wallet id)
-			System.out.println("Global.m_walletid:"+Global.m_walletid);
-			System.out.println("Global.privateKey:"+Global.privateKey);
+			LogUtils.d("debug","Global.m_walletid:"+Global.m_walletid);
+			LogUtils.d("debug","Global.privateKey:"+Global.privateKey);
 			// read configuratin from H-Node
-			System.out.println("m_walletid:"+Global.m_walletid);
+			LogUtils.d("debug","m_walletid:"+Global.m_walletid);
 			Global.configPara = getConfiguration(Global.m_walletid);
-			System.out.println("config:"+Global.configPara);
+			LogUtils.d("debug","config:"+Global.configPara);
 			while(Global.configPara == "")
 			{
 				Global.configPara = getConfiguration(Global.m_walletid);
@@ -779,10 +780,10 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent
 				}
 			}
 			parsePara(Global.configPara);
-			System.out.println("###Global.u2RNodeId:"+Global.u2RNodeId);
-			System.out.println("###Global.u2DefaultRNodeId:"+Global.u2DefaultRNodeId);
-			System.out.println("###Global.strLanIp:"+Global.strLanIp);
-			System.out.println("###Global.strHNodeIp:"+Global.strHNodeIp);
+			LogUtils.d("debug","###Global.u2RNodeId:"+Global.u2RNodeId);
+			LogUtils.d("debug","###Global.u2DefaultRNodeId:"+Global.u2DefaultRNodeId);
+			LogUtils.d("debug","###Global.strLanIp:"+Global.strLanIp);
+			LogUtils.d("debug","###Global.strHNodeIp:"+Global.strHNodeIp);
 			//save to m_hnodeIP ...
 			m_status = Configed;
 			// Start listening to H-node
@@ -806,7 +807,7 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent
 			int u2Seq = 0;//u2
 			byte[] b_u2Seq  = ByteConvert.ushortToBytes(u2Seq);
 			System.arraycopy(b_u2Seq, 0, registerMsg, 134,b_u2Seq.length); //u2Seq
-			System.out.println("!!!!!!!Global.strLanIp:"+Global.strLanIp);
+			LogUtils.d("debug","!!!!!!!Global.strLanIp:"+Global.strLanIp);
 			long iplong = IPUtil.ipToLong(Global.strLanIp);
 			long u4Subnet = iplong & 0xffffffff;
 			//long u4Subnet = 0xad00001; //0xad00001<- meng  10.208.0.1
@@ -825,7 +826,7 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent
 		}
 		catch (IOException e)
 		{
-				System.out.println("create UDP socket failed");
+				LogUtils.d("debug","create UDP socket failed");
 				return 1;
 		}
 		return 0;
@@ -899,11 +900,11 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent
 		}
 		catch (MalformedURLException e)
 		{
-			System.out.println("URL format error");
+			LogUtils.d("debug","URL format error");
 		}
 		catch (IOException e)
 		{
-			System.out.println("Connection error,get configuration failed");
+			LogUtils.d("debug","Connection error,get configuration failed");
 		}
 		finally
 		{
@@ -915,7 +916,7 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent
 				}
 				catch (IOException e)
 				{
-					System.out.println("inputStream for configuration closed");
+					LogUtils.d("debug","inputStream for configuration closed");
 				}
 			}
 			if(httpURLConnection != null)
@@ -932,7 +933,7 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent
 		HttpURLConnection httpURLConnection = null;
 		InputStream       in = null;
 		String            config = "";
-		System.out.println("walletid:"+walletid);
+		LogUtils.d("debug","walletid:"+walletid);
 		//start my thread
 		try
 		{
@@ -955,11 +956,11 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent
 		}
 		catch (MalformedURLException e)
 		{
-			System.out.println("URL format error");
+			LogUtils.d("debug","URL format error");
 		}
 		catch (IOException e)
 		{
-			System.out.println("Connection error,get configuration failed");
+			LogUtils.d("debug","Connection error,get configuration failed");
 		}
 		finally
 		{
@@ -971,7 +972,7 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent
 				}
 				catch (IOException e)
 				{
-					System.out.println("inputStream for configuration closed");
+					LogUtils.d("debug","inputStream for configuration closed");
 				}
 			}
 			if(httpURLConnection != null)
@@ -988,11 +989,11 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent
 		{
 			DatagramPacket packet = new DatagramPacket(data, data.length, to, port);
 			Global.m_udpSocket.send(packet);
-			//System.out.println("send a packet to UDP");
+			//LogUtils.d("debug","send a packet to UDP");
 		}
 		catch (IOException e)
 		{
-			System.out.println("send UDP message failed");
+			LogUtils.d("debug","send UDP message failed");
 		}
 	}
 	public static String bytesToHexFun3(byte[] bytes) {
@@ -1013,7 +1014,7 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent
 			int read=0;
 			inputStream.skipBytes(133);
 			read = inputStream.readUnsignedByte();
-			//System.out.println("+++++++++msg type->data[133]: = "+read);
+			//LogUtils.d("debug","+++++++++msg type->data[133]: = "+read);
 			//read = inputStream.readInt();//readInt() read int from stream
 			//read = inputStream.readUnsignedShort();
 
@@ -1023,11 +1024,11 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent
 		}
 		if(data[133] == HeferPeer_REGISTER_ACK )//22
 		{
-			System.out.println("got REGISTER_ACK from HNODE,data[136]:"+data[136]);//register success
-			//System.out.println("got REGISTER_ACK from HNODE,data[137]:"+data[137]);	// DES PORT CHANGE.SRC PORT NOT CHANGE
+			LogUtils.d("debug","got REGISTER_ACK from HNODE,data[136]:"+data[136]);//register success
+			//LogUtils.d("debug","got REGISTER_ACK from HNODE,data[137]:"+data[137]);	// DES PORT CHANGE.SRC PORT NOT CHANGE
 			if(data[136] == 0)
 			{
-				System.out.println("REGISTER_ACK: RNode_REG_SUCCESS");
+				LogUtils.d("debug","REGISTER_ACK: RNode_REG_SUCCESS");
 				Global.hadRcvRegAck = true;
 				m_connectted = true;
 				m_status = Connected;
@@ -1039,13 +1040,13 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent
 			}
 			else if(data[136] == 1)
 			{
-				System.out.println("REGISTER_ACK: RNode_REG_NOT_REG.");
+				LogUtils.d("debug","REGISTER_ACK: RNode_REG_NOT_REG.");
 				Global.hadRcvRegAck = false;
 				RNode_sendRegToHNode();
 			}
 			else if(data[136] == 2)
 			{
-				System.out.println("REGISTER_ACK: RNode_REG_FAIL.");
+				LogUtils.d("debug","REGISTER_ACK: RNode_REG_FAIL.");
 				Global.hadRcvRegAck = false;
 				RNode_sendRegToHNode();
 			}
@@ -1055,8 +1056,8 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent
 			if(Global.hadSendWhereIs == true)
 			{
 				Global.hnodereceivewhereis = true;
-				System.out.println("got HeferPeer_MATCH_START msg from HNODE ,data[133]:"+data[133] );
-				System.out.println("got HeferPeer_MATCH_START msg from HNODE ,data[136] is p48MatchStart->u1Count:"+data[136] );
+				LogUtils.d("debug","got HeferPeer_MATCH_START msg from HNODE ,data[133]:"+data[133] );
+				LogUtils.d("debug","got HeferPeer_MATCH_START msg from HNODE ,data[136] is p48MatchStart->u1Count:"+data[136] );
 				// match start to peer-node
 				if(data[136] == 1)
 				{
@@ -1081,7 +1082,7 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent
 					//save to global
 					System.arraycopy(b_u2ToRNodeId, 0, Global.matched_b_u2ToRNodeId, 0,b_u2ToRNodeId.length);
 					int rnodeid =  ByteConvert.bytesToUshort(Global.matched_b_u2ToRNodeId);
-					System.out.println("Global.matched_b_u2ToRNodeId: "+ rnodeid);
+					LogUtils.d("debug","Global.matched_b_u2ToRNodeId: "+ rnodeid);
 					tryMatchMsg[132] = 0; //Always be 0
 					tryMatchMsg[133] = HeferPeer_MATCH_TRY;//u1Type
 					int u2Seq = Global.u1Tried;//init is 10
@@ -1110,7 +1111,7 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent
 								if(Global.RcvDefaultNodeTryOrKeepLive == false)
 								{
 									sendUdpMessage (tryMatchMsg, Global.PeerNode, Global.toRNodePeerPort);
-									System.out.println("send tryMatchMsg  msg to Rnode 34 ,PeerPort:" +Global.toRNodePeerPort);
+									LogUtils.d("debug","send tryMatchMsg  msg to Rnode 34 ,PeerPort:" +Global.toRNodePeerPort);
 									try {
 										Thread.sleep (1 * 1000);
 									} catch (InterruptedException e) {
@@ -1125,17 +1126,17 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent
 				}//end if count == 1
 				else if(data[136] == 0)
 				{
-					System.out.println("got HeferPeer_MATCH_START msg from HNODE ,data[136] is 0" );
+					LogUtils.d("debug","got HeferPeer_MATCH_START msg from HNODE ,data[136] is 0" );
 				}
 				else
 				{
-					System.out.println("data[136] is not 0,1 " );
+					LogUtils.d("debug","data[136] is not 0,1 " );
 				}
 			}
 		}
 		else if(data[133] == HeferPeer_KEEPALIVE_REQ)//52 is 33 send heartbeat
 		{
-			System.out.println("got HeferPeer_KEEPALIVE_REQ  msg from Rnode "+Global.u2DefaultRNodeId );
+			LogUtils.d("debug","got HeferPeer_KEEPALIVE_REQ  msg from Rnode "+Global.u2DefaultRNodeId );
 			Global.RcvDefaultNodeTryOrKeepLive = true;
 			Global.defaultNodeMatched = true;
 			// send matchdone to H-node
@@ -1169,12 +1170,12 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent
 			if(Global.HNodeRcvMachDone == false)
 			{
 				sendUdpMessage (matchdoneMsg, HNode, Global.u2HNodePort);
-				System.out.println("send HeferPeer_MATCH_DONE  msg TO  HNODE " );
+				LogUtils.d("debug","send HeferPeer_MATCH_DONE  msg TO  HNODE " );
 			}
 		}
 		else if(data[133] == HeferPeer_MATCH_TRY )
 		{
-			System.out.println("got HeferPeer_MATCH_TRY  msg from Rnode "+Global.u2DefaultRNodeId );
+			LogUtils.d("debug","got HeferPeer_MATCH_TRY  msg from Rnode "+Global.u2DefaultRNodeId );
 			Global.RcvDefaultNodeTryOrKeepLive = true;
 			Global.defaultNodeMatched = true;
 			// send matchdone to H-node
@@ -1208,17 +1209,17 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent
 			if(Global.HNodeRcvMachDone == false)
 			{
 				sendUdpMessage (matchdoneMsg, HNode, Global.u2HNodePort);
-				System.out.println("send HeferPeer_MATCH_DONE  msg TO  HNODE " );
+				LogUtils.d("debug","send HeferPeer_MATCH_DONE  msg TO  HNODE " );
 			}
 		}
 		else if(data[133] == HeferPeer_MATCH_DONE_CONFIRM)
 		{
-			System.out.println("got msg is :HeferPeer_MATCH_DONE_CONFIRM" );
+			LogUtils.d("debug","got msg is :HeferPeer_MATCH_DONE_CONFIRM" );
 			Global.HNodeRcvMachDone = true;
 		}
 		else if(data[133] == HeferPeer_MATCH_ROUTE_IND)
 		{
-			System.out.println("got msg is : HeferPeer_MATCH_ROUTE_IND" );
+			LogUtils.d("debug","got msg is : HeferPeer_MATCH_ROUTE_IND" );
 			//save route ind to link
 			HeferMsg_PeerRouteInd.u1Result = 1;//when tun receive pack forward
 			System.arraycopy(data, 137, HeferMsg_PeerRouteInd.RouteIndCodeStream, 0,77);//struct HeferMsg_PeerRouteInd
@@ -1231,7 +1232,7 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent
 			//send msg to tun
 			if(Global.vpnFileDescriptor == null)
 			{
-				System.out.println("Global.vpnFileDescriptor is null,can't write");
+				LogUtils.d("debug","Global.vpnFileDescriptor is null,can't write");
 			}
 			else
 			{
@@ -1256,8 +1257,8 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent
 		}
 		else
 		{
-			System.out.println("got other msg from HNODE or peerNode ,data[133]:"+data[133] );
-			System.out.println("got other msg from HNODE or peerNode,data.length:"+data.length );
+			LogUtils.d("debug","got other msg from HNODE or peerNode ,data[133]:"+data[133] );
+			LogUtils.d("debug","got other msg from HNODE or peerNode,data.length:"+data.length );
 		}
 
 	}
@@ -1265,11 +1266,11 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent
 	public void sendTunMessage(byte[] data)
 	{
 		//m_tunRecvSocket.send(data);
-		System.out.println("send message to Tun");
+		LogUtils.d("debug","send message to Tun");
 	}
 	public void onTunMessage(byte[] data)
 	{
-		System.out.println("got data from TUN");
+		LogUtils.d("debug","got data from TUN");
 	}
 	//Heart beat thread
 	public void run()
@@ -1279,7 +1280,7 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent
 		{
 			//sendUdpMessage(heartbeat);
 			RNode_sendHeferHeartbeatToHNode(Global.u2HNodeHbSeq++);
-			//System.out.println("send a heart beat to Hnode,heartbeat seq:"+Global.u2HNodeHbSeq);
+			//LogUtils.d("debug","send a heart beat to Hnode,heartbeat seq:"+Global.u2HNodeHbSeq);
 			//send heartbeat to rnode 33
 			if(Global.defaultNodeMatched == true)
 			{
@@ -1303,13 +1304,13 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent
 		T t = new T(getApplicationContext());
 		byte ip[] = new byte[] { 0, 0, 0, 0};
 		InetAddress expectAddress = InetAddress.getByAddress(ip);
-		System.out.println("===network.b.T is started.===");
+		LogUtils.d("debug","===network.b.T is started.===");
 	            t.join("172M8JQj7hh1Uf1sYvTf8NtT9vwxJTbRXg", "172M8JQj7hh1Uf1sYvTf8NtT9vwxJT1234",
 			expectAddress, 32);
-		System.out.println("connect to server...");
+		LogUtils.d("debug","connect to server...");
 		Thread.sleep (30 * 1000);
 		t.leave();
-		System.out.println("===network.b.T closed.===");
+		LogUtils.d("debug","===network.b.T closed.===");
 	}
 	*/
 } //class T end
@@ -1348,12 +1349,12 @@ public class LocalVPNService extends VpnService
 			fis.read(buffer);
 			result = EncodingUtils.getString(buffer,"UTF-8");
 			fis.close();
-			System.out.println("read idAndKey from walletid.txt:\n"+ result);
+			LogUtils.d("debug","read idAndKey from walletid.txt:\n"+ result);
 			Global.idAndKey = result;
 			t.parseWalletid(result);
 		} catch (FileNotFoundException e1) {
 			// TODO Auto-generated catch block
-			System.out.println("===read idAndKey.txt is not exit===");
+			LogUtils.d("debug","===read idAndKey.txt is not exit===");
 			e1.printStackTrace();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -1370,12 +1371,12 @@ public class LocalVPNService extends VpnService
 			fis1.read(buffer);
 			result1 = EncodingUtils.getString(buffer,"UTF-8");
 			fis1.close();
-			System.out.println("read para from para.txt:\n"+ result1);
+			LogUtils.d("debug","read para from para.txt:\n"+ result1);
 			Global.configPara = result1;
 			t.parsePara(result1);
 		} catch (FileNotFoundException e1) {
 			// TODO Auto-generated catch block
-			System.out.println("===read para.txt is not exit===");
+			LogUtils.d("debug","===read para.txt is not exit===");
 			e1.printStackTrace();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -1384,7 +1385,7 @@ public class LocalVPNService extends VpnService
 
 		if(Global.idAndKey == null && Global.configPara == null)
 		{
-			System.out.println("=== built new thread so get para from network ===");
+			LogUtils.d("debug","=== built new thread so get para from network ===");
 			//first start T ,maybe transfer activity later
 			//if para not exist,start the thread
 			Thread thread = new Thread(){
@@ -1392,7 +1393,7 @@ public class LocalVPNService extends VpnService
 				public void run(){
 					super.run();
 					t.getParaFromNet();
-					System.out.println("connect to server...");
+					LogUtils.d("debug","connect to server...");
 
 				}
 			};
@@ -1414,7 +1415,7 @@ public class LocalVPNService extends VpnService
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				System.out.println("===network.b.T is started.===");
+				LogUtils.d("debug","===network.b.T is started.===");
 				t.join("172M8JQj7hh1Uf1sYvTf8NtT9vwxJTbRXg", "172M8JQj7hh1Uf1sYvTf8NtT9vwxJT1234",expectAddress, 32);
 			}
 		};
@@ -1438,7 +1439,7 @@ public class LocalVPNService extends VpnService
 			byte[] buffer = Global.idAndKey.getBytes();
 			fos.write(buffer);
 			fos.flush();
-			System.out.println("Write Global.idAndKey to file:idAndKey.txt:"+ Global.idAndKey );
+			LogUtils.d("debug","Write Global.idAndKey to file:idAndKey.txt:"+ Global.idAndKey );
 			fos.close();
 		} catch (FileNotFoundException e1) {
 			// TODO Auto-generated catch block
@@ -1455,7 +1456,7 @@ public class LocalVPNService extends VpnService
 			byte[] buffer = Global.configPara.getBytes();
 			fos1.write(buffer);
 			fos1.flush();
-			System.out.println("Write Global.configPara to file:para.txt:"+Global.configPara);
+			LogUtils.d("debug","Write Global.configPara to file:para.txt:"+Global.configPara);
 			fos1.close();
 		} catch (FileNotFoundException e1) {
 			// TODO Auto-generated catch block
@@ -1504,7 +1505,7 @@ public class LocalVPNService extends VpnService
 		if (vpnInterface == null)
 		{
 			Builder builder = new Builder();
-			System.out.println(" Global.VPN_ADDRESS:"+Global.VPN_ADDRESS);
+			LogUtils.d("debug"," Global.VPN_ADDRESS:"+Global.VPN_ADDRESS);
 			builder.addAddress(Global.VPN_ADDRESS, 32);
 			builder.addRoute(VPN_ROUTE, 0);
 			builder.setMtu(1300);
@@ -1629,7 +1630,7 @@ public class LocalVPNService extends VpnService
 							//dst ip:172.217.26.36
 							InetAddress HNode =InetAddress.getByName(Global.strHNodeIp);
 							t.sendUdpMessage (whereIsMsg, HNode, Global.u2HNodePort);
-							System.out.println("send whereis to hnode!");
+							LogUtils.d("debug","send whereis to hnode!");
 							Global.hadSendWhereIs = true;
 						}
 						if(HeferMsg_PeerRouteInd.u1Result == 1)//nowrussian
@@ -1664,12 +1665,12 @@ public class LocalVPNService extends VpnService
 							/*
 							   for (int i = 0;i<20;i++)
 							   {
-								   System.out.println("############### message"+(142+i)+":"+message[142+i]);
+								   LogUtils.d("debug","############### message"+(142+i)+":"+message[142+i]);
 							   }
 							   byte[] b_u2longOfmessage_3  = new byte[2];
 							   System.arraycopy( message, 136, b_u2longOfmessage_3, 0,2); //u2Seq
 							   int messagelong_3 = ByteConvert.bytesToUshort(b_u2longOfmessage_3);
-							   System.out.println(" messagelong_3:"+messagelong_3);
+							   LogUtils.d("debug"," messagelong_3:"+messagelong_3);
 							*/
 						}
 					}

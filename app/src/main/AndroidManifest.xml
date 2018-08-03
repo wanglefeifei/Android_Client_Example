@@ -1,22 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="network.b.bnet">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="network.b.bnet">
 
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
-    <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <!-- 往sdcard中读写数据的权限 -->
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <!-- 使用相机的权限 -->
-    <uses-feature android:name="android.hardware.camera"/>
+    <uses-feature android:name="android.hardware.camera" />
     <!-- 自动聚焦的权限 -->
-    <uses-feature android:name="android.hardware.camera.autofocus"/>
+    <uses-feature android:name="android.hardware.camera.autofocus" />
 
-    <uses-permission android:name="android.permission.CAMERA"/>
-    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_LOGS" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:name=".base.BNetApplication"
@@ -26,23 +29,21 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/MyAppTheme">
-        <activity android:name=".MainActivity">
-        </activity>
+        <activity android:name=".MainActivity"
+           android:launchMode="singleTask" />
 
         <service
             android:name=".service.BnetService"
             android:enabled="true"
             android:exported="true"
             android:permission="android.permission.BIND_VPN_SERVICE"
-            android:process=":mine.bnet">
-        </service>
+            android:process=":mine.bnet" />
         <service
             android:name=".service.LocalVPNService"
-            android:process=":mine.bnet"
-            android:permission="android.permission.BIND_VPN_SERVICE" />
+            android:permission="android.permission.BIND_VPN_SERVICE"
+            android:process=":mine.bnet" />
 
-        <activity android:name=".userinfo.UserMain">
-        </activity>
+        <activity android:name=".userinfo.UserMain" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -51,33 +52,35 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths"/>
+                android:resource="@xml/file_paths" />
         </provider>
 
         <activity android:name=".startload.StartActivity">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".startload.LoginActivity">
-        </activity>
-        <activity android:name=".net.Net_Logout">
-        </activity>
-        <activity android:name=".order.HistoricalBill">
-        </activity>
-        <activity android:name=".net.Join_Network">
-        </activity>
-        <activity android:name=".order.Recharge">
-        </activity>
-        <activity android:name=".net.Management_Network">
-        </activity>
-        <activity android:name=".net.Management_Network_Detailed">
-        </activity>
-        <activity android:name=".userinfo.User_Message">
-        </activity>
-        <activity android:name=".utils.zxing.activity.CaptureActivity"></activity>
+        <activity android:name=".startload.LoginActivity" />
+        <activity android:name=".net.Net_Logout" />
+        <activity android:name=".order.HistoricalBill" />
+        <activity android:name=".net.Join_Network" />
+        <activity android:name=".order.Recharge" />
+        <activity android:name=".net.Management_Network" />
+        <activity android:name=".net.Management_Network_Detailed" />
+        <activity android:name=".userinfo.User_Message" />
+        <activity android:name=".utils.zxing.activity.CaptureActivity" />
+
+        <service
+            android:name=".service.LogService"
+            android:enabled="true"
+            android:exported="true" />
+
+        <activity
+            android:name=".protect.LiveActivity"
+            android:theme="@style/LiveStyle"
+            />
     </application>
 
 </manifest>
