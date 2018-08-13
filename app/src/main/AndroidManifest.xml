@@ -30,19 +30,26 @@
         android:supportsRtl="true"
         android:theme="@style/MyAppTheme">
         <activity android:name=".MainActivity"
-           android:launchMode="singleTask" />
+            android:launchMode="singleTask"
+            android:configChanges="screenSize|keyboardHidden|orientation"
+            android:screenOrientation="portrait" />
 
         <service
             android:name=".service.BnetService"
             android:enabled="true"
             android:exported="true"
             android:permission="android.permission.BIND_VPN_SERVICE"
-            android:process=":mine.bnet" />
+            android:process=":mine.bnet" >
+            <meta-data android:name ="android.net.VpnService.SUPPORTS_ALWAYS_ON"
+                android:value="true"/>
+        </service>
         <service
             android:name=".service.LocalVPNService"
             android:permission="android.permission.BIND_VPN_SERVICE"
-            android:process=":mine.bnet" />
-
+            android:process=":mine.bnet">
+            <meta-data android:name ="android.net.VpnService.SUPPORTS_ALWAYS_ON"
+                android:value="true"/>
+        </service>
         <activity android:name=".userinfo.UserMain" />
 
         <provider

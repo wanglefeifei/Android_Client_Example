@@ -32,9 +32,9 @@ public class BNetApplication extends Application {
     private User user;
     private static BNetApplication bNetApplication = null;
 
-
+    public static boolean isChecked = false;
     private static ServiceConnection serviceConnection;
-    private boolean serviceBind = false;
+    public static boolean serviceBind = false;
 
     public BnetAidlInterface getBnetAidlInterface() {
         return bnetAidlInterface;
@@ -56,12 +56,12 @@ public class BNetApplication extends Application {
     public static BNetApplication getInstance() {
         return bNetApplication;
     }
-
     public Context getContext() {
         return context;
     }
 
     public void DestoryBnetService() {
+        isChecked = false;
         if (serviceConnection != null && serviceBind) {
             Log.d(TAG, "DestoryBnetService:   unbindsercice ");
             unbindService(serviceConnection);
@@ -88,6 +88,7 @@ public class BNetApplication extends Application {
             public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
                 Log.d(TAG, "onServiceConnected:..... ");
                 bnetAidlInterface = BnetAidlInterface.Stub.asInterface(iBinder);
+                isChecked = true;
                 serviceBind = true;
                 StartBnetServiceJoin();
             }

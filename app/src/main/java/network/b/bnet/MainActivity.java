@@ -79,7 +79,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
             @Override
             public void onServiceDisconnected(ComponentName componentName) {
-                Log.d("wanglf", "onServiceDisconnected: [[[");
             }
         };
 
