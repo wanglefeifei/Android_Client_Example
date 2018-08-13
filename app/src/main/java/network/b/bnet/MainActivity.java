@@ -7,7 +7,9 @@ import android.content.ServiceConnection;
 import android.net.VpnService;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -18,9 +20,11 @@ import com.facebook.drawee.backends.pipeline.Fresco;
 import java.util.ArrayList;
 import java.util.List;
 
+import network.b.bnet.base.BNetApplication;
 import network.b.bnet.base.BaseActivity;
 import network.b.bnet.protect.OnePixelReceiver;
 import network.b.bnet.service.BnetAidlInterface;
+import network.b.bnet.service.BnetService;
 import network.b.bnet.service.LocalVPNService;
 import network.b.bnet.service.LogService;
 import network.b.bnet.utils.Utils;
@@ -75,7 +79,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
             @Override
             public void onServiceDisconnected(ComponentName componentName) {
-
+                Log.d("wanglf", "onServiceDisconnected: [[[");
             }
         };
 
@@ -187,10 +191,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
     @Override
     protected void onResume() {
-        if (!(Utils.isServiceRunning(getApplicationContext(), LocalVPNService.class.getName()))) {
+        super.onResume();
+        if (BNetApplication.isChecked && !Utils.isServiceRunning(getApplicationContext(),LocalVPNService.class.getName())) {
             mainActivity_linkView.main_net_status_switch.setChecked(false);
         }
-        super.onResume();
     }
 
     @Override
