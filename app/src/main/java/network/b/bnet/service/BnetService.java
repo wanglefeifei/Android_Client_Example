@@ -308,7 +308,7 @@ public class BnetService extends Service {
             Join.deviceAddr = deviceAddr;
             Join.maskBit = maskBit;
             intent = new Intent(getApplicationContext(), LocalVPNService.class);
-            Log.d(TAG + "test", "11111111111111111");
+            Log.d("debug" + "test", "11111111111111111");
             startService(intent);
             return 0;
         }
