@@ -304,6 +304,46 @@
 
     <View
         android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/base_while_transparent40" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="5"
+        android:background="@color/base_white_color"
+        android:paddingLeft="@dimen/dis_element_to_side"
+        android:paddingRight="@dimen/dis_element_to_side">
+
+        <ImageView
+            android:id="@+id/main_user_version_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:src="@mipmap/main_my_managenet_icon" />
+
+        <TextView
+            android:id="@+id/main_user_version_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/dis_element_to_element"
+            android:layout_toRightOf="@+id/main_user_version_img"
+            android:text="应用版本"
+            android:textColor="@color/base_blue_color"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/main_user_versionname"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:text="0.0"
+            android:textColor="@color/base_red_color" />
+    </RelativeLayout>
+    <View
+        android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="3"></View>
 

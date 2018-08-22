@@ -1151,10 +1151,12 @@ class T implements Runnable, UdpSocketEvent, TunSocketEvent
                                     if(Global.curDestIp_lan != 0)
                                     {
                                         MatchedNodeInfo LanMatchNode = Global.RNode_getLanMatchNodeInfo(Global.curDestIp_lan);
-                                        LogUtils.d("debug","4444 send tryMatchMsg  msg to match Rnode of lan ,PeerPort:" + LanMatchNode.PeerPort);
+                                        if (LanMatchNode != null) {
+                                            LogUtils.d("debug", "4444 send tryMatchMsg  msg to match Rnode of lan ,PeerPort:" + LanMatchNode.PeerPort);
 
-                                        sendUdpMessage (tryMatchMsg, LanMatchNode.PeerNodeAddr,LanMatchNode.PeerPort );
-                                        LogUtils.d("debug","send tryMatchMsg  msg to match Rnode of lan ,PeerPort:" + LanMatchNode.PeerPort);
+                                            sendUdpMessage(tryMatchMsg, LanMatchNode.PeerNodeAddr, LanMatchNode.PeerPort);
+                                            LogUtils.d("debug", "send tryMatchMsg  msg to match Rnode of lan ,PeerPort:" + LanMatchNode.PeerPort);
+                                        }
                                     }
                                     else
                                     {

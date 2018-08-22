@@ -11,6 +11,7 @@ import android.util.Log;
 
 import network.b.bnet.model.BnetServiceJoinParams;
 import network.b.bnet.model.User;
+import network.b.bnet.protect.CrashHandler;
 import network.b.bnet.service.BnetAidlInterface;
 import network.b.bnet.service.BnetService;
 
@@ -49,7 +50,7 @@ public class BNetApplication extends Application {
         super.onCreate();
         bNetApplication = this;
         context = getApplicationContext();
-
+        CrashHandler.getInstance().init(this);
 
     }
 
