@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:background="@color/base_background_color"
-              android:orientation="vertical">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/base_background_color"
+    android:orientation="vertical">
 
     <View
         android:layout_width="match_parent"
@@ -21,14 +21,13 @@
             android:layout_weight="1"
             android:gravity="right|center_vertical">
 
-            <com.facebook.drawee.view.SimpleDraweeView
-                xmlns:fresco="http://schemas.android.com/apk/res-auto"
+            <com.facebook.drawee.view.SimpleDraweeView xmlns:fresco="http://schemas.android.com/apk/res-auto"
                 android:layout_width="@dimen/mian_head_img_height"
                 android:layout_height="@dimen/mian_head_img_height"
                 fresco:actualImageScaleType="centerCrop"
                 fresco:placeholderImage="@mipmap/user_h"
                 fresco:placeholderImageScaleType="centerCrop"
-                fresco:roundAsCircle="true"/>
+                fresco:roundAsCircle="true" />
         </LinearLayout>
 
         <LinearLayout
@@ -50,12 +49,12 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="ID:"/>
+                    android:text="ID:" />
 
                 <TextView
                     android:id="@+id/main_userid"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content" />
             </LinearLayout>
 
             <LinearLayout
@@ -65,12 +64,12 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="余额:"/>
+                    android:text="余额:" />
 
                 <TextView
                     android:id="@+id/main_user_balance"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
@@ -92,22 +91,22 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:gravity="left|center_vertical"
-            android:layout_weight="3">
+            android:layout_weight="3"
+            android:gravity="left|center_vertical">
 
             <TextView
                 android:layout_width="wrap_content"
-                android:textSize="14sp"
-                android:gravity="center"
                 android:layout_height="wrap_content"
-                android:text="名称"/>
+                android:gravity="center"
+                android:text="名称"
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/main_user_nickname"
-                android:textSize="14sp"
-                android:gravity="center"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="14sp" />
         </LinearLayout>
 
         <View
@@ -118,22 +117,22 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:gravity="left|center_vertical"
-            android:layout_weight="3">
+            android:layout_weight="3"
+            android:gravity="left|center_vertical">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="14sp"
                 android:gravity="center"
-                android:text="手机"/>
+                android:text="手机"
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/main_user_mobile"
                 android:layout_width="wrap_content"
-                android:textSize="14sp"
+                android:layout_height="wrap_content"
                 android:gravity="center"
-                android:layout_height="wrap_content"/>
+                android:textSize="14sp" />
         </LinearLayout>
     </LinearLayout>
 
@@ -156,7 +155,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
-            android:src="@mipmap/main_my_history_icon"/>
+            android:src="@mipmap/main_my_history_icon" />
 
         <TextView
             android:id="@+id/main_user_bill_txt"
@@ -167,13 +166,13 @@
             android:layout_toRightOf="@+id/main_user_bill_img"
             android:text="历史帐单"
             android:textColor="@color/base_blue_color"
-            android:textSize="14sp"/>
+            android:textSize="14sp" />
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"/>
+            android:layout_centerVertical="true" />
     </RelativeLayout>
 
     <View
@@ -196,7 +195,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
-            android:src="@mipmap/main_my_recharge_icon"/>
+            android:src="@mipmap/main_my_recharge_icon" />
 
         <TextView
             android:id="@+id/main_user_recharge_txt"
@@ -207,13 +206,13 @@
             android:layout_toRightOf="@+id/main_user_recharge_img"
             android:text="充值"
             android:textColor="@color/base_blue_color"
-            android:textSize="14sp"/>
+            android:textSize="14sp" />
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"/>
+            android:layout_centerVertical="true" />
     </RelativeLayout>
 
     <View
@@ -235,7 +234,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
-            android:src="@mipmap/main_my_message_icon"/>
+            android:src="@mipmap/main_my_message_icon" />
 
         <TextView
             android:id="@+id/main_user_message_txt"
@@ -246,7 +245,7 @@
             android:layout_toRightOf="@+id/main_user_message_img"
             android:text="消息"
             android:textColor="@color/base_blue_color"
-            android:textSize="14sp"/>
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/main_user_message_count"
@@ -256,7 +255,7 @@
             android:layout_centerVertical="true"
             android:background="@drawable/shape_bit_cricle_red"
             android:text="2"
-            android:textColor="@color/base_white_color"/>
+            android:textColor="@color/base_white_color" />
     </RelativeLayout>
 
     <View
@@ -278,7 +277,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
-            android:src="@mipmap/main_my_managenet_icon"/>
+            android:src="@mipmap/main_my_managenet_icon" />
 
         <TextView
             android:id="@+id/main_user_mnet_txt"
@@ -289,7 +288,7 @@
             android:layout_toRightOf="@+id/main_user_mnet_img"
             android:text="管理网络"
             android:textColor="@color/base_blue_color"
-            android:textSize="14sp"/>
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/main_user_mnet_count"
@@ -299,13 +298,14 @@
             android:layout_centerVertical="true"
             android:background="@drawable/shape_bit_cricle_red"
             android:text="2"
-            android:textColor="@color/base_white_color"/>
+            android:textColor="@color/base_white_color" />
     </RelativeLayout>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1px"
         android:background="@color/base_while_transparent40" />
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -338,13 +338,23 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="5dp"
             android:text="0.0"
             android:textColor="@color/base_red_color" />
+        <TextView
+            android:id="@+id/main_user_gitversion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/main_user_versionname"
+            android:text="commit version : d073b800"
+            android:textColor="@color/base_blue_color" />
     </RelativeLayout>
+
     <View
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="3"></View>
+        android:layout_weight="2" />
 
 </LinearLayout>

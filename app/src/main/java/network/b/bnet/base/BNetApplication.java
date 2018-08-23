@@ -5,10 +5,16 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 
+import network.b.bnet.MainActivity_LinkView;
+import network.b.bnet.MainActivity_Presenter;
+import network.b.bnet.R;
 import network.b.bnet.model.BnetServiceJoinParams;
 import network.b.bnet.model.User;
 import network.b.bnet.protect.CrashHandler;
@@ -61,7 +67,10 @@ public class BNetApplication extends Application {
         return context;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     public void DestoryBnetService() {
+        MainActivity_Presenter.mHandler.removeMessages(MainActivity_Presenter.COLOR_CHANGE);
+        MainActivity_Presenter.mainActivity_linkView.join_forum_txt.setTextColor(getColor(R.color.base_gray_color));
         isChecked = false;
         if (serviceConnection != null && serviceBind) {
             Log.d(TAG, "DestoryBnetService:   unbindsercice ");

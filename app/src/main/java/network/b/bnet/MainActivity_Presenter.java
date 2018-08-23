@@ -1,10 +1,16 @@
 package network.b.bnet;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
+import android.os.Handler;
+import android.os.Message;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.view.View;
 import android.widget.CompoundButton;
@@ -16,7 +22,7 @@ import network.b.bnet.base.BNetApplication;
 import network.b.bnet.net.Join_Network;
 import network.b.bnet.net.Net_Logout;
 import network.b.bnet.service.BnetService;
-import network.b.bnet.startload.StartActivity;
+import network.b.bnet.service.LocalVPNService;
 import network.b.bnet.utils.SharePreferenceMain;
 import network.b.bnet.utils.Utils;
 
@@ -27,11 +33,27 @@ import network.b.bnet.utils.Utils;
 public class MainActivity_Presenter implements View.OnClickListener {
 
 
-    private MainActivity_LinkView mainActivity_linkView;
+    public static MainActivity_LinkView mainActivity_linkView;
     private MainActivity_MyView mainActivity_myView;
     private MainActivity mainActivity;
-    private boolean isclick = false;
-
+    public static boolean isclick = false;
+    private Message msg = Message.obtain();
+    public static int COLOR_CHANGE = 1;
+    static int[] colors = new int[] { Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW,Color.CYAN };
+    static int index = 0;
+    @SuppressLint("HandlerLeak")
+    public static Handler mHandler = new Handler() {
+        public void handleMessage(Message msg) {
+            if (msg.what == COLOR_CHANGE) {
+                index += 1;
+                if (index == colors.length) {
+                    index = 0;
+                }
+                mainActivity_linkView.join_forum_txt.setTextColor(colors[index]);
+                mHandler.sendEmptyMessageDelayed(COLOR_CHANGE, 1500);
+            }
+        }
+    };
     public MainActivity_Presenter(MainActivity_LinkView linkView, MainActivity_MyView myView, MainActivity Activity) {
         mainActivity_linkView = linkView;
         mainActivity_myView = myView;
@@ -46,6 +68,7 @@ public class MainActivity_Presenter implements View.OnClickListener {
             mainActivity_linkView.main_net_status_switch.setChecked(true);
         }
         mainActivity_linkView.main_net_status_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 if (mainActivity == null) {
@@ -54,7 +77,11 @@ public class MainActivity_Presenter implements View.OnClickListener {
                 if (b) {
                     if (mainActivity != null)
                         mainActivity.startVPN();
-                        isclick = true;
+                    if (!mHandler.hasMessages(MainActivity_Presenter.COLOR_CHANGE)) {
+                        mHandler.sendEmptyMessage(MainActivity_Presenter.COLOR_CHANGE);
+                    }
+                    mHandler.sendEmptyMessageDelayed(MainActivity_Presenter.COLOR_CHANGE, 1500);
+                    isclick = true;
 
                 } else {
                     BNetApplication.getInstance().DestoryBnetService();

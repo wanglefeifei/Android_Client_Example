@@ -187,11 +187,23 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        MainActivity_Presenter.mHandler.removeMessages(MainActivity_Presenter.COLOR_CHANGE);
+    }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (BNetApplication.isChecked && !Utils.isServiceRunning(getApplicationContext(),LocalVPNService.class.getName())) {
+        if (MainActivity_Presenter.isclick) {
+            if (!MainActivity_Presenter.mHandler.hasMessages(MainActivity_Presenter.COLOR_CHANGE)) {
+                MainActivity_Presenter.mHandler.sendEmptyMessage(MainActivity_Presenter.COLOR_CHANGE);
+            }
+            MainActivity_Presenter.mHandler.sendEmptyMessageDelayed(MainActivity_Presenter.COLOR_CHANGE, 1500);
+        }
+        if (BNetApplication.isChecked && !Utils.isServiceRunning(getApplicationContext(),LocalVPNService.class.getName())
+                && !Utils.isServiceRunning(getApplicationContext(),BnetService.class.getName())) {
             mainActivity_linkView.main_net_status_switch.setChecked(false);
         }
     }
