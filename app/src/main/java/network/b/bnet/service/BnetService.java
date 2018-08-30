@@ -335,6 +335,7 @@ public class BnetService extends Service {
 //                                            //BnetService.this.stopSelf();
 //                            Process.killProcess(Process.myPid());
 //                        }
+            Log.d("debug", "leave: .......");
             BnetService.this.stopSelf();
             stopService(intent);
             Process.killProcess(Process.myPid());

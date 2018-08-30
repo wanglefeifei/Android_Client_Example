@@ -16,13 +16,15 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Toast;
 
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.UUID;
 
 import network.b.bnet.base.BNetApplication;
 import network.b.bnet.net.Join_Network;
 import network.b.bnet.net.Net_Logout;
 import network.b.bnet.service.BnetService;
-import network.b.bnet.service.LocalVPNService;
 import network.b.bnet.utils.SharePreferenceMain;
 import network.b.bnet.utils.Utils;
 
@@ -36,10 +38,11 @@ public class MainActivity_Presenter implements View.OnClickListener {
     public static MainActivity_LinkView mainActivity_linkView;
     private MainActivity_MyView mainActivity_myView;
     private MainActivity mainActivity;
+    private int ret;
     public static boolean isclick = false;
     private Message msg = Message.obtain();
     public static int COLOR_CHANGE = 1;
-    static int[] colors = new int[] { Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW,Color.CYAN };
+    static int[] colors = new int[] { Color.BLUE,Color.GRAY ,Color.RED};
     static int index = 0;
     @SuppressLint("HandlerLeak")
     public static Handler mHandler = new Handler() {
@@ -50,7 +53,7 @@ public class MainActivity_Presenter implements View.OnClickListener {
                     index = 0;
                 }
                 mainActivity_linkView.join_forum_txt.setTextColor(colors[index]);
-                mHandler.sendEmptyMessageDelayed(COLOR_CHANGE, 1500);
+                mHandler.sendEmptyMessageDelayed(COLOR_CHANGE, 2000);
             }
         }
     };
@@ -80,7 +83,7 @@ public class MainActivity_Presenter implements View.OnClickListener {
                     if (!mHandler.hasMessages(MainActivity_Presenter.COLOR_CHANGE)) {
                         mHandler.sendEmptyMessage(MainActivity_Presenter.COLOR_CHANGE);
                     }
-                    mHandler.sendEmptyMessageDelayed(MainActivity_Presenter.COLOR_CHANGE, 1500);
+                    mHandler.sendEmptyMessageDelayed(MainActivity_Presenter.COLOR_CHANGE, 2000);
                     isclick = true;
 
                 } else {
@@ -92,17 +95,38 @@ public class MainActivity_Presenter implements View.OnClickListener {
         mainActivity_myView.main_user_versionname.setText(getVersionName(mainActivity));
         loadWebView();
     }
-
     private void loadWebView() {
         mainActivity_linkView.join_forum_network.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try{
+                            Runtime runtime = Runtime.getRuntime();
+                            try {
+                                Process p = runtime.exec("ping -c 3 10.50.0.24");
+                                ret = p.waitFor();
+                                Log.i("wanglf", "Process:"+ret);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }catch(Exception e){
+                            e.printStackTrace();
+
+                        }
+                    }
+                }).start();
                 if (!isclick) {
-                    Toast.makeText(mainActivity,"请打开VPN按钮才能访问此网址",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mainActivity, "请打开VPN按钮才能访问此网址", Toast.LENGTH_SHORT).show();
                 } else {
-                    Uri uri = Uri.parse("http://10.50.0.24");
-                    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                    mainActivity.startActivity(intent);
+                    if (ret == 0) {
+                        Uri uri = Uri.parse("http://10.50.0.24");
+                        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                        mainActivity.startActivity(intent);
+                    } else {
+                        Toast.makeText(mainActivity, "请稍等,正在连接", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         });

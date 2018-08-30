@@ -5,14 +5,12 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
 
-import network.b.bnet.MainActivity_LinkView;
 import network.b.bnet.MainActivity_Presenter;
 import network.b.bnet.R;
 import network.b.bnet.model.BnetServiceJoinParams;
@@ -74,6 +72,7 @@ public class BNetApplication extends Application {
         isChecked = false;
         if (serviceConnection != null && serviceBind) {
             Log.d(TAG, "DestoryBnetService:   unbindsercice ");
+            Log.d("debug", "DestoryBnetService:    ");
             unbindService(serviceConnection);
             serviceBind = false;
         }
@@ -126,6 +125,7 @@ public class BNetApplication extends Application {
                 @Override
                 public void run() {
                     try {
+                        Log.d("debug", "run: join...");
                         bnetAidlInterface.join(bnetServiceJoinParams.getnWalletAddr(), bnetServiceJoinParams.getdWalletAddr(), bnetServiceJoinParams.getDeviceAddr(), bnetServiceJoinParams.getMaskBit());
                     } catch (RemoteException e) {
                         e.printStackTrace();

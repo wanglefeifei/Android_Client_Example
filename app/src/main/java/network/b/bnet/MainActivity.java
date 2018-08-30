@@ -200,7 +200,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
             if (!MainActivity_Presenter.mHandler.hasMessages(MainActivity_Presenter.COLOR_CHANGE)) {
                 MainActivity_Presenter.mHandler.sendEmptyMessage(MainActivity_Presenter.COLOR_CHANGE);
             }
-            MainActivity_Presenter.mHandler.sendEmptyMessageDelayed(MainActivity_Presenter.COLOR_CHANGE, 1500);
+            MainActivity_Presenter.mHandler.sendEmptyMessageDelayed(MainActivity_Presenter.COLOR_CHANGE, 2000);
         }
         if (BNetApplication.isChecked && !Utils.isServiceRunning(getApplicationContext(),LocalVPNService.class.getName())
                 && !Utils.isServiceRunning(getApplicationContext(),BnetService.class.getName())) {
