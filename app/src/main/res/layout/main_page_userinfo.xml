@@ -348,7 +348,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_below="@+id/main_user_versionname"
-            android:text="commit version : d073b800"
+            android:text="commit version : 6705216"
             android:textColor="@color/base_blue_color" />
     </RelativeLayout>
 
